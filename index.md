@@ -3,9 +3,9 @@ layout: default
 title: Accueil
 ---
 
-# Bienvenue au LaboMath
+<h1>Bienvenue au LaboMath</h1>
 
-Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Seconde au BTS, en passant par la consolidation pour les bacheliers professionnels, chacun y trouvera fiches, cahiers et supports en accès libre.
+<p>Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Seconde au BTS, en passant par la consolidation pour les bacheliers professionnels, chacun y trouvera fiches, cahiers et supports en accès libre.</p>
 
 <div class="separateur">∞</div>
 
@@ -14,7 +14,7 @@ Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Secon
   <p>Le LaboMath ouvre ses portes. Les premières ressources arrivent prochainement.</p>
 </div>
 
-## Explorer par niveau
+<h2>Explorer par niveau</h2>
 
 <p class="sous-titre">Cinq portes d'entrée selon votre classe ou votre formation.</p>
 
@@ -48,8 +48,8 @@ Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Secon
 
 <div class="separateur">Σ</div>
 
-## Le projet
+<h2>Le projet</h2>
 
-Animé par l'équipe de mathématiques du Lycée de Baudre, le LaboMath rassemble en un lieu unique les ressources travaillées au sein de l'établissement. Tout est en libre accès, pour les élèves comme pour les collègues.
+<p>Animé par l'équipe de mathématiques du Lycée de Baudre, le LaboMath rassemble en un lieu unique les ressources travaillées au sein de l'établissement. Tout est en libre accès, pour les élèves comme pour les collègues.</p>
 
-Pour toute remarque ou suggestion, contactez l'équipe de mathématiques de l'établissement.
+<p>Pour toute remarque ou suggestion, contactez l'équipe de mathématiques de l'établissement.</p>
