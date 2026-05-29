@@ -5,40 +5,51 @@ title: Accueil
 
 # Bienvenue au LaboMath
 
-Le LaboMath du Lycée de Baudre rassemble des ressources mathématiques destinées aux élèves de la voie générale et technologique, aux étudiants de BTS, ainsi qu'aux bacheliers professionnels accédant à un BTS. Vous y trouverez fiches d'automatismes, cahiers de consolidation et supports de cours, en accès libre.
+Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Seconde au BTS, en passant par la consolidation pour les bacheliers professionnels, chacun y trouvera fiches, cahiers et supports en accès libre.
+
+<div class="separateur">∞</div>
 
 <div class="actualite">
-  <p class="actualite-titre">Actualité</p>
-  <p>Le site est en cours de construction. Les premières ressources seront mises en ligne prochainement.</p>
+  <p class="actualite-titre">∂ Actualité</p>
+  <p>Le LaboMath ouvre ses portes. Les premières ressources arrivent prochainement.</p>
 </div>
 
-## Accéder aux ressources
+## Explorer par niveau
+
+<p class="sous-titre">Cinq portes d'entrée selon votre classe ou votre formation.</p>
 
 <div class="cartes">
   <a href="{{ '/seconde/' | relative_url }}" class="carte">
+    <span class="symbole">π</span>
     <h3>Seconde</h3>
     <p>Fiches d'automatismes pour la classe de Seconde générale et technologique.</p>
   </a>
   <a href="{{ '/premiere/' | relative_url }}" class="carte">
+    <span class="symbole">Σ</span>
     <h3>Première</h3>
     <p>Fiches d'automatismes pour la classe de Première générale et technologique.</p>
   </a>
   <a href="{{ '/terminale/' | relative_url }}" class="carte">
+    <span class="symbole">∫</span>
     <h3>Terminale</h3>
-    <p>Ressources pour la classe de Terminale générale et technologique.</p>
+    <p>Cours et exercices pour la classe de Terminale générale et technologique.</p>
   </a>
   <a href="{{ '/passerelle/' | relative_url }}" class="carte">
-    <h3>Passerelle Bac → BTS</h3>
+    <span class="symbole">→</span>
+    <h3>Passerelle</h3>
     <p>Consolidation pour les bacheliers professionnels accédant en BTS.</p>
   </a>
   <a href="{{ '/bts/' | relative_url }}" class="carte">
+    <span class="symbole">∞</span>
     <h3>BTS</h3>
     <p>Ressources pour les étudiants de BTS.</p>
   </a>
 </div>
 
-## À propos
+<div class="separateur">Σ</div>
 
-Ce site est animé par l'équipe de mathématiques du Lycée de Baudre. Il a pour vocation de mettre à disposition des élèves et des étudiants un ensemble de ressources travaillées au sein de l'établissement, en libre accès.
+## Le projet
+
+Animé par l'équipe de mathématiques du Lycée de Baudre, le LaboMath rassemble en un lieu unique les ressources travaillées au sein de l'établissement. Tout est en libre accès, pour les élèves comme pour les collègues.
 
 Pour toute remarque ou suggestion, contactez l'équipe de mathématiques de l'établissement.
