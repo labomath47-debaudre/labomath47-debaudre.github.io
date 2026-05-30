@@ -9,33 +9,47 @@ title: Passerelle Bac → BTS
 
 # Passerelle Bac → BTS
 
-L'entrée en BTS marque une étape : quelle que soit la voie d'origine, chaque étudiant gagne à reprendre appui sur les fondamentaux mathématiques et à se familiariser avec les outils spécifiques à sa spécialité dès les premières semaines. L'équipe de mathématiques du Lycée de Baudre propose un **parcours de consolidation** déployé sur les six premières semaines de l'année.
+<div class="passerelle-intro">
 
-## Accéder au parcours par spécialité
+  <div>
+    <p>L'entrée en BTS marque une étape : quelle que soit la voie d'origine, chaque étudiant gagne à reprendre appui sur les fondamentaux mathématiques et à se familiariser avec les outils spécifiques à sa spécialité dès les premières semaines.</p>
+    <p>L'équipe de mathématiques du Lycée de Baudre propose un <strong>parcours de consolidation</strong> déployé sur les six premières semaines de l'année, articulant un tronc commun de rappels et des outils adaptés à chaque spécialité, en concertation avec les enseignants des disciplines professionnelles.</p>
+  </div>
 
-<p class="sous-titre">Quatre parcours, un par BTS industriel du Lycée de Baudre.</p>
+  <div>
+    <p class="acces-rapide-titre">Accéder par spécialité</p>
+    <div class="acces-rapide">
+      <a href="{{ '/passerelle/cpi/' | relative_url }}" class="carte-compacte">
+        <span class="symbole">⚙</span>
+        <div>
+          <span class="titre">BTS CPI</span>
+          <span class="description">Conception de Produits Industriels</span>
+        </div>
+      </a>
+      <a href="{{ '/passerelle/cprp/' | relative_url }}" class="carte-compacte">
+        <span class="symbole">⚒</span>
+        <div>
+          <span class="titre">BTS CPRP</span>
+          <span class="description">Processus de Réalisation</span>
+        </div>
+      </a>
+      <a href="{{ '/passerelle/electro/' | relative_url }}" class="carte-compacte">
+        <span class="symbole">⚡</span>
+        <div>
+          <span class="titre">BTS Électrotechnique</span>
+          <span class="description">Génie électrique et automatismes</span>
+        </div>
+      </a>
+      <a href="{{ '/passerelle/ciel/' | relative_url }}" class="carte-compacte">
+        <span class="symbole">⌬</span>
+        <div>
+          <span class="titre">BTS CIEL</span>
+          <span class="description">Cybersécurité, Informatique, Réseaux</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="cartes">
-  <a href="{{ '/passerelle/cpi/' | relative_url }}" class="carte">
-    <span class="symbole">⚙</span>
-    <h3>BTS CPI</h3>
-    <p>Conception de Produits Industriels.</p>
-  </a>
-  <a href="{{ '/passerelle/cprp/' | relative_url }}" class="carte">
-    <span class="symbole">⚒</span>
-    <h3>BTS CPRP</h3>
-    <p>Conception des Processus de Réalisation de Produits.</p>
-  </a>
-  <a href="{{ '/passerelle/electro/' | relative_url }}" class="carte">
-    <span class="symbole">⚡</span>
-    <h3>BTS Électrotechnique</h3>
-    <p>Génie électrique et automatismes industriels.</p>
-  </a>
-  <a href="{{ '/passerelle/ciel/' | relative_url }}" class="carte">
-    <span class="symbole">⌬</span>
-    <h3>BTS CIEL</h3>
-    <p>Cybersécurité, Informatique et Réseaux, Électronique.</p>
-  </a>
 </div>
 
 <div class="separateur">∂</div>
