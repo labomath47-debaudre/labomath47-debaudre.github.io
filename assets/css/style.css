@@ -70,33 +70,38 @@ body { font-family: var(--police-corps); font-size: 16px; line-height: 1.7; colo
    ============================================================ */
 .passerelle-intro {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 2.5rem;
   align-items: start;
-  margin: 1.5rem 0 2rem;
+  margin: 1.5rem 0 0;
 }
+
+.passerelle-intro + .separateur {
+  margin: 0.75rem 0;
+}
+
 .acces-rapide-titre {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: var(--couleur-texte-tertiaire);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.75rem;
 }
 
 .acces-rapide {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .acces-rapide .carte-compacte {
   background: var(--couleur-fond-blanc);
   border: 1px solid var(--couleur-bordure);
   border-radius: 3px;
-  padding: 14px 18px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   text-decoration: none !important;
   color: inherit;
   transition: border-color 0.15s, transform 0.15s;
@@ -109,7 +114,7 @@ body { font-family: var(--police-corps); font-size: 16px; line-height: 1.7; colo
 
 .acces-rapide .carte-compacte .symbole {
   font-family: var(--police-titre);
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: var(--couleur-accent-or);
   line-height: 1;
   flex-shrink: 0;
@@ -117,19 +122,23 @@ body { font-family: var(--police-corps); font-size: 16px; line-height: 1.7; colo
 
 .acces-rapide .carte-compacte .titre {
   font-family: var(--police-titre);
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--couleur-accent);
   display: block;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .acces-rapide .carte-compacte .description {
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   color: var(--couleur-texte-tertiaire);
   display: block;
   margin-top: 2px;
-  line-height: 1.3;
+  line-height: 1.25;
+}
+
+.passerelle-intro + .separateur + h2 {
+  margin-top: 0;
 }
 
 @media (max-width: 800px) {
