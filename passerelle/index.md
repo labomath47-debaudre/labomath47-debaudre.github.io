@@ -9,13 +9,20 @@ title: Passerelle Bac → BTS
 
 # Passerelle Bac → BTS
 
-## Un parcours de consolidation à l'entrée en BTS
+## Du baccalauréat aux études supérieures
 
-Au Lycée de Baudre, plusieurs sections de BTS industriels accueillent chaque année des bacheliers professionnels. La transition entre Bac Pro et BTS est exigeante en mathématiques : les outils mobilisés dans les enseignements professionnels du BTS supposent une aisance que le baccalauréat professionnel ne consolide pas toujours suffisamment.
+L'entrée en BTS marque une étape : les mathématiques y sont mobilisées comme un outil au service des enseignements professionnels, avec leurs propres exigences et leurs propres rythmes. Quelle que soit la voie d'origine — générale, technologique ou professionnelle —, chaque étudiant gagne à reprendre appui sur les fondamentaux et à se familiariser avec les outils spécifiques à sa spécialité dès les premières semaines.
 
-Pour accompagner cette transition, l'équipe de mathématiques du Lycée de Baudre propose un **parcours de consolidation** déployé sur les six premières semaines de l'année. Chaque semaine cible des notions précises, en lien direct avec ce qui sera utilisé dès le premier semestre dans la spécialité.
+Pour accompagner cette transition, l'équipe de mathématiques du Lycée de Baudre propose un **parcours de consolidation** déployé sur les six premières semaines de l'année.
 
-Ce parcours est différencié par spécialité : les besoins ne sont pas les mêmes en mécanique, en plasturgie, en électrotechnique ou en réseaux. Les cahiers correspondants ont été rédigés en concertation avec les enseignants des disciplines professionnelles.
+## Comment le parcours est construit
+
+Chaque cahier articule deux dimensions complémentaires :
+
+- un **tronc commun de rappels** sur les bases mathématiques mobilisées dans tous les BTS industriels (calcul, fonctions, repérage, trigonométrie, etc.) ;
+- des **outils adaptés à chaque spécialité**, en lien direct avec les enseignements professionnels du premier semestre.
+
+Les cahiers ont été rédigés en concertation avec les enseignants des disciplines professionnelles, pour que les notions consolidées soient effectivement celles qui seront mobilisées en cours.
 
 <div class="separateur">∂</div>
 
@@ -50,6 +57,6 @@ Ce parcours est différencié par spécialité : les besoins ne sont pas les mê
 
 ## Mode d'emploi
 
-Chaque page spécialité présente le rôle des mathématiques dans la formation, donne accès au **cahier complet** de la spécialité (à utiliser comme support de référence pendant les six premières semaines), ainsi qu'aux **cahiers de semaine** détachables (à imprimer ou consulter au fil de la progression).
+Chaque page spécialité présente le rôle des mathématiques dans la formation, donne accès au **cahier complet** (à utiliser comme support de référence pendant les six premières semaines), ainsi qu'aux **cahiers de semaine** détachables (à imprimer ou consulter au fil de la progression).
 
 Les enseignants peuvent consulter les **versions professeur** sur la page [Versions professeur]({{ '/passerelle/professeurs/' | relative_url }}).
