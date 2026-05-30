@@ -72,10 +72,9 @@ body { font-family: var(--police-corps); font-size: 16px; line-height: 1.7; colo
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2.5rem;
-  align-items: center;
+  align-items: start;
   margin: 1.5rem 0 2rem;
 }
-
 .acces-rapide-titre {
   font-size: 0.78rem;
   font-weight: 500;
