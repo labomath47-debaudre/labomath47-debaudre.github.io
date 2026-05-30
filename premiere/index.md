@@ -1,15 +1,15 @@
 ---
 layout: default
-title: Première
+title: Terminale
 ---
 
 <div class="niveau-entete">
-  <span class="symbole">Σ</span>
+  <span class="symbole">∫</span>
 </div>
 
-# Première — Automatismes
+# Terminale
 
-Cette page rassemble les fiches d'automatismes pour les élèves de Première générale et technologique. Les automatismes consolident les acquis de Seconde et préparent aux exigences de la classe de Terminale.
+Cette page rassemble les ressources pour les élèves de Terminale générale et technologique : fiches méthode, exercices d'entraînement et supports en lien avec le programme.
 
 ## Documents disponibles
 
