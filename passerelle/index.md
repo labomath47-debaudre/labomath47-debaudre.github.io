@@ -60,4 +60,4 @@ title: Passerelle Bac → BTS
 
 Chaque page spécialité présente le rôle des mathématiques dans la formation, donne accès au **cahier complet** (à utiliser comme support de référence pendant les six premières semaines), ainsi qu'aux **cahiers de semaine** détachables (à imprimer ou consulter au fil de la progression).
 
-Les enseignants peuvent consulter les **versions professeur** sur la page [Versions professeur]({{ '/passerelle/professeurs/' | relative_url }}).
+Les enseignants peuvent consulter les **versions professeur** dans l'[espace enseignants]({{ '/enseignants/' | relative_url }}).
