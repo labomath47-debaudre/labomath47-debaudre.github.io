@@ -65,3 +65,77 @@ body { font-family: var(--police-corps); font-size: 16px; line-height: 1.7; colo
   .cartes { grid-template-columns: 1fr; }
   .niveau-entete .symbole { font-size: 2.5rem; }
 }
+/* ============================================================
+   Mise en page passerelle (deux colonnes intro + accès rapide)
+   ============================================================ */
+.passerelle-intro {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin: 1rem 0 2rem;
+}
+
+.acces-rapide-titre {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--couleur-texte-tertiaire);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.75rem;
+}
+
+.acces-rapide {
+  display: grid;
+  gap: 8px;
+}
+
+.acces-rapide .carte-compacte {
+  background: var(--couleur-fond-blanc);
+  border: 1px solid var(--couleur-bordure);
+  border-radius: 3px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none !important;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.acces-rapide .carte-compacte:hover {
+  border-color: var(--couleur-accent);
+  transform: translateY(-1px);
+}
+
+.acces-rapide .carte-compacte .symbole {
+  font-family: var(--police-titre);
+  font-size: 1.4rem;
+  color: var(--couleur-accent-or);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.acces-rapide .carte-compacte .titre {
+  font-family: var(--police-titre);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--couleur-accent);
+  display: block;
+  line-height: 1.2;
+}
+
+.acces-rapide .carte-compacte .description {
+  font-size: 0.78rem;
+  color: var(--couleur-texte-tertiaire);
+  display: block;
+  margin-top: 1px;
+  line-height: 1.3;
+}
+
+@media (max-width: 800px) {
+  .passerelle-intro {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
