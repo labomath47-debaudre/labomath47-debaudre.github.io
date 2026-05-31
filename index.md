@@ -54,7 +54,7 @@ title: Accueil
 
 <p>Pour toute remarque ou suggestion, contactez l'équipe de mathématiques de l'établissement.</p>
 <a href="{{ '/projets/' | relative_url }}" class="carte">
-    <span class="symbole">∂</span>
+    <span class="symbole">⊕</span>
     <h3>Projets</h3>
     <p>L'engagement pédagogique de l'équipe : automatismes, consolidation, mixité.</p>
   </a>
