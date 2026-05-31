@@ -7,9 +7,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <!-- MathJax en mode SVG : produit des formules en SVG natif, capturables par html2canvas -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']]
+      },
+      svg: {
+        fontCache: 'local',
+        scale: 1.05  // taille des formules
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
@@ -112,8 +126,8 @@
     #zone-pdf .corrige { margin-bottom: 10px; font-size: 14px; line-height: 1.55; }
     #zone-pdf .corrige .num { font-weight: 500; color: #1e3a5f; font-size: 14px; }
     #zone-pdf .corrige .texte { color: #4a443c; }
-    /* KaTeX : conserver ses polices mathématiques natives, juste harmoniser la taille */
-    #zone-pdf .katex { font-size: 1.05em; }
+    /* MathJax : assurer un rendu propre des SVG */
+    #zone-pdf mjx-container { font-size: 1.05em; }
     #zone-pdf .pied-pdf { margin-top: 30px; padding-top: 10px; border-top: 1px solid #d9cfb8; font-size: 11px; color: #6b6359; text-align: center; }
   </style>
 </head>
@@ -1838,31 +1852,25 @@ function composerHTMLCorriges(exercices, difficulte) {
 async function capturerHTMLversCanvas(html) {
   const zone = document.getElementById('zone-pdf');
   zone.innerHTML = html;
-  renderMathInElement(zone, {
-    delimiters: [{ left: '$', right: '$', display: false }, { left: '$$', right: '$$', display: true }],
-    throwOnError: false
-  });
-  // Attendre que toutes les polices (notamment KaTeX_Math, KaTeX_Main, etc.) soient totalement chargées
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
+  // Faire rendre les formules par MathJax (en SVG)
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    await window.MathJax.typesetPromise([zone]);
   }
-  // Délai supplémentaire pour s'assurer que KaTeX a fini de rendre toutes ses formules
-  await new Promise(r => setTimeout(r, 600));
+  // Petit délai supplémentaire pour s'assurer que le DOM est stabilisé
+  await new Promise(r => setTimeout(r, 200));
   const apercu = document.getElementById('apercu-pdf');
   apercu.style.display = 'block';
   apercu.style.position = 'absolute';
   apercu.style.left = '-9999px';
 
   // AVANT la capture : repérer les bordures des blocs (exercices ou corrigés)
-  // pour pouvoir découper proprement le PDF
   const zoneTop = zone.getBoundingClientRect().top;
   const blocs = zone.querySelectorAll('.exercice, .corrige');
-  const limites = []; // positions verticales (en pixels HTML) des fins de bloc
+  const limites = [];
   for (const b of blocs) {
     const r = b.getBoundingClientRect();
     limites.push(r.bottom - zoneTop);
   }
-  // useCORS + foreignObjectRendering pour mieux capturer les polices web
   const canvas = await html2canvas(zone, {
     scale: 2,
     backgroundColor: '#ffffff',
@@ -1870,7 +1878,6 @@ async function capturerHTMLversCanvas(html) {
     logging: false
   });
   apercu.style.display = 'none';
-  // Convertir les limites HTML en limites de pixels canvas (scale 2)
   const limitesCanvas = limites.map(l => l * 2);
   return { canvas, limitesCanvas };
 }
@@ -2016,26 +2023,6 @@ document.getElementById('bouton-generer').addEventListener('click', genererPDF);
 
 construireArbre();
 majTotal();
-
-// Précharger les polices KaTeX en rendant une formule cachée dès le démarrage
-// Cela force le navigateur à télécharger les polices KaTeX_Math, KaTeX_Main, etc.
-window.addEventListener('load', () => {
-  const prechauffe = document.createElement('div');
-  prechauffe.style.position = 'absolute';
-  prechauffe.style.left = '-9999px';
-  prechauffe.style.top = '-9999px';
-  prechauffe.style.visibility = 'hidden';
-  prechauffe.textContent = '$x^2 + 2x \\times 3 = \\dfrac{a}{b} - \\sqrt{c}$';
-  document.body.appendChild(prechauffe);
-  setTimeout(() => {
-    if (window.renderMathInElement) {
-      renderMathInElement(prechauffe, {
-        delimiters: [{ left: '$', right: '$', display: false }],
-        throwOnError: false
-      });
-    }
-  }, 100);
-});
 </script>
 </body>
 </html>
