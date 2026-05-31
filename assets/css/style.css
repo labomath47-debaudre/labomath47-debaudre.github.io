@@ -58,7 +58,7 @@ body {
   display: block;
   max-width: 100%;
   height: auto;
-  max-height: 110px;
+  max-height: 140px;
 }
 
 .site-nav {
@@ -297,4 +297,16 @@ body {
 
 @media (max-width: 800px) {
   .passerelle-intro { grid-template-columns: 1fr; gap: 1.5rem; }
+   /* Bouton "Passerelle Bac → BTS" sur deux lignes */
+.site-nav .nav-deux-lignes {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+}
+.site-nav .nav-deux-lignes .ligne-2 {
+  font-size: 0.82rem;
+  color: var(--couleur-texte-tertiaire);
+  font-weight: 400;
+}
 }
