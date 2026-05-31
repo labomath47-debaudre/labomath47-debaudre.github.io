@@ -93,8 +93,8 @@
     #zone-pdf .corrige { margin-bottom: 10px; font-size: 14px; line-height: 1.55; }
     #zone-pdf .corrige .num { font-weight: 500; color: #1e3a5f; font-size: 14px; }
     #zone-pdf .corrige .texte { color: #4a443c; }
-    /* KaTeX : assurer une taille uniforme entre formules et texte */
-    #zone-pdf .katex { font-size: 1em !important; }
+    /* KaTeX : conserver ses polices mathématiques natives, juste harmoniser la taille */
+    #zone-pdf .katex { font-size: 1.05em; }
     #zone-pdf .pied-pdf { margin-top: 30px; padding-top: 10px; border-top: 1px solid #d9cfb8; font-size: 11px; color: #6b6359; text-align: center; }
   </style>
 </head>
@@ -1842,30 +1842,34 @@ async function capturerHTMLversCanvas(html) {
 // (jamais couper au milieu d'un exercice)
 function ajouterCanvasAuPDF(pdf, capture, debut) {
   const pageW_mm = 210, pageH_mm = 297;
-  const margeBas_mm = 4; // marge de sécurité en bas de page
+  const margeBas_mm = 8;    // marge basse de sécurité
+  const margeHaut_mm = 12;  // marge haute pour les pages 2 et suivantes
   const canvas = capture.canvas;
   const limitesCanvas = capture.limitesCanvas || [];
 
   // Conversion : 1 mm de page = (canvas.width / pageW_mm) px de canvas
   const pxParMm = canvas.width / pageW_mm;
-  const pageH_px = pageH_mm * pxParMm;
   const margeBas_px = margeBas_mm * pxParMm;
 
   if (!debut) pdf.addPage();
 
   let debutPagePx = 0; // position du haut de la page courante dans le canvas
+  let estPremierePagePDF = true;
   while (debutPagePx < canvas.height) {
-    // Position théorique de fin de page (avant les marges)
-    const finTheorique = debutPagePx + pageH_px - margeBas_px;
+    // Hauteur utile disponible sur cette page (en pixels canvas)
+    // - 1re page : utilise toute la hauteur (l'en-tête HTML fait déjà office de marge haute)
+    // - pages suivantes : on réserve une marge haute
+    const margeHautPxThisPage = estPremierePagePDF ? 0 : (margeHaut_mm * pxParMm);
+    const hauteurUtile_px = (pageH_mm * pxParMm) - margeHautPxThisPage - margeBas_px;
+
+    // Position théorique de fin de page
+    const finTheorique = debutPagePx + hauteurUtile_px;
     let finPage;
 
     if (finTheorique >= canvas.height) {
-      // Dernière page, on prend tout le reste
       finPage = canvas.height;
     } else {
-      // Chercher la dernière limite (fin d'exercice) qui se trouve avant finTheorique
-      // et au-dessus de debutPagePx + une hauteur minimale (pour ne pas faire de pages quasi vides)
-      const hauteurMinPage = pageH_px * 0.3;
+      const hauteurMinPage = hauteurUtile_px * 0.3;
       let meilleureLimite = finTheorique;
       for (const l of limitesCanvas) {
         if (l > debutPagePx + hauteurMinPage && l <= finTheorique) {
@@ -1880,18 +1884,20 @@ function ajouterCanvasAuPDF(pdf, capture, debut) {
     canvasTemp.width = canvas.width;
     canvasTemp.height = finPage - debutPagePx;
     const ctx = canvasTemp.getContext('2d');
-    // Fond blanc
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
-    // Copier la portion utile
     ctx.drawImage(canvas, 0, debutPagePx, canvas.width, finPage - debutPagePx,
                           0, 0, canvas.width, finPage - debutPagePx);
+
     // Calculer la hauteur correspondante en mm
     const hauteurPortion_mm = (finPage - debutPagePx) / pxParMm;
     const imgData = canvasTemp.toDataURL('image/png');
-    pdf.addImage(imgData, 'PNG', 0, 0, pageW_mm, hauteurPortion_mm);
+    // Position verticale : marge haute pour les pages 2+, 0 pour la première
+    const yPos = estPremierePagePDF ? 0 : margeHaut_mm;
+    pdf.addImage(imgData, 'PNG', 0, yPos, pageW_mm, hauteurPortion_mm);
 
     debutPagePx = finPage;
+    estPremierePagePDF = false;
     if (debutPagePx < canvas.height) pdf.addPage();
   }
 }
