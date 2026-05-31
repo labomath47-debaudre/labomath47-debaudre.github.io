@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Générateur d'automatismes — LaboMath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --couleur-fond: #f5efe4;
+      --couleur-fond-blanc: #ffffff;
+      --couleur-accent: #1e3a5f;
+      --couleur-accent-or: #c9b896;
+      --couleur-texte: #1a1a1a;
+      --couleur-texte-secondaire: #4a443c;
+      --couleur-texte-tertiaire: #6b6359;
+      --couleur-texte-disabled: #b8b0a1;
+      --couleur-bordure: #d9cfb8;
+      --couleur-bordure-claire: #e8dfd0;
+      --police-titre: 'Crimson Pro', Georgia, serif;
+      --police-corps: 'IBM Plex Sans', -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--police-corps);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--couleur-texte);
+      background: var(--couleur-fond);
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 820px; margin: 0 auto; }
+    h1 { font-family: var(--police-titre); font-size: 2rem; font-weight: 500; color: var(--couleur-accent); margin-bottom: 0.5rem; }
+    .intro { color: var(--couleur-texte-secondaire); margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .formulaire { background: var(--couleur-fond-blanc); border: 1px solid var(--couleur-bordure); border-radius: 4px; padding: 1.5rem; margin-bottom: 2rem; }
+    .bloc { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--couleur-bordure-claire); }
+    .bloc:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    .bloc-titre { font-weight: 500; color: var(--couleur-accent); margin-bottom: 0.6rem; font-size: 1rem; }
+    .difficulte { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .difficulte label { display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; padding: 0.4rem 0.8rem; border: 1px solid var(--couleur-bordure); border-radius: 3px; transition: background 0.15s, border-color 0.15s; }
+    .difficulte label:hover { background: var(--couleur-fond); }
+    .difficulte label:has(input:checked) { background: var(--couleur-fond); border-color: var(--couleur-accent); }
+    .etoiles { color: var(--couleur-accent-or); letter-spacing: 1px; }
+    .arbre { user-select: none; }
+    .noeud { margin-bottom: 2px; }
+    .ligne { display: flex; align-items: center; padding: 4px 6px; border-radius: 3px; transition: background 0.1s; }
+    .ligne:hover { background: var(--couleur-fond); }
+    .triangle { display: inline-block; width: 18px; cursor: pointer; color: var(--couleur-texte-tertiaire); font-size: 0.75rem; flex-shrink: 0; transition: transform 0.15s; }
+    .triangle.vide { cursor: default; }
+    .triangle.ouvert { transform: rotate(90deg); }
+    .case { width: 16px; height: 16px; accent-color: var(--couleur-accent); cursor: pointer; margin-right: 8px; flex-shrink: 0; }
+    .libelle { flex-grow: 1; cursor: pointer; font-size: 0.95rem; }
+    .libelle.parent-coche { color: var(--couleur-texte-tertiaire); font-style: italic; }
+    .libelle.bientot { color: var(--couleur-texte-disabled); font-style: italic; }
+    .badge { font-size: 0.7rem; color: var(--couleur-texte-disabled); padding: 1px 6px; border: 1px solid var(--couleur-bordure-claire); border-radius: 2px; margin-left: 0.5rem; }
+    .compteur { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; flex-shrink: 0; }
+    .compteur button { width: 22px; height: 22px; border: 1px solid var(--couleur-bordure); background: var(--couleur-fond-blanc); color: var(--couleur-accent); cursor: pointer; border-radius: 3px; font-size: 0.85rem; line-height: 1; padding: 0; font-weight: 500; }
+    .compteur button:hover { background: var(--couleur-fond); border-color: var(--couleur-accent); }
+    .compteur .valeur { width: 32px; text-align: center; font-size: 0.9rem; font-weight: 500; color: var(--couleur-accent); }
+    .compteur .valeur.zero { color: var(--couleur-texte-disabled); font-weight: 400; }
+    .niveau-2 { padding-left: 28px; }
+    .niveau-3 { padding-left: 56px; }
+    .total { margin-top: 1rem; padding: 0.8rem 1rem; background: var(--couleur-fond); border-radius: 3px; display: flex; justify-content: space-between; align-items: center; font-weight: 500; color: var(--couleur-accent); }
+    .actions-rapides { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .bouton-petit { padding: 0.35rem 0.7rem; font-size: 0.82rem; background: var(--couleur-fond); color: var(--couleur-texte-tertiaire); border: 1px solid var(--couleur-bordure); border-radius: 3px; cursor: pointer; font-family: inherit; }
+    .bouton-petit:hover { background: var(--couleur-fond-blanc); color: var(--couleur-accent); border-color: var(--couleur-accent); }
+    .bouton { display: inline-block; background: var(--couleur-accent); color: white; border: none; padding: 0.75rem 1.8rem; border-radius: 3px; font-size: 1rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+    .bouton:hover { background: #2a4d7a; }
+    .bouton:disabled { background: #999; cursor: not-allowed; }
+    .message { margin-top: 1rem; padding: 0.7rem 1rem; border-radius: 3px; display: none; font-size: 0.92rem; }
+    .message.erreur { background: #fbe9e7; color: #8b2c20; border: 1px solid #d4877a; }
+    .message.succes { background: #e7f4e8; color: #2c5e2e; border: 1px solid #7ab07c; }
+    .retour-site { display: inline-block; margin-top: 1.5rem; color: var(--couleur-accent); text-decoration: none; }
+    .retour-site:hover { text-decoration: underline; }
+    #apercu-pdf { display: none; }
+    #zone-pdf { background: white; padding: 50px 60px; width: 794px; font-family: 'Crimson Pro', Georgia, serif; color: #1a1a1a; }
+    #zone-pdf .entete-pdf { border-bottom: 2px solid #1e3a5f; padding-bottom: 12px; margin-bottom: 24px; }
+    #zone-pdf .entete-pdf h2 { font-size: 22px; color: #1e3a5f; margin-bottom: 4px; }
+    #zone-pdf .entete-pdf .sous { font-size: 13px; color: #6b6359; }
+    #zone-pdf .exercice { margin-bottom: 18px; page-break-inside: avoid; }
+    #zone-pdf .exercice .num { display: inline-block; width: 28px; font-weight: 500; color: #1e3a5f; font-size: 16px; }
+    #zone-pdf .exercice .enonce { display: inline-block; font-size: 16px; line-height: 1.55; vertical-align: top; }
+    #zone-pdf .exercice .reponse-cadre { margin-top: 8px; margin-left: 28px; border: 1px solid #d9cfb8; border-radius: 2px; min-height: 38px; }
+    #zone-pdf .section-corriges { page-break-before: always; padding-top: 30px; }
+    #zone-pdf .section-corriges h3 { font-size: 18px; color: #1e3a5f; border-bottom: 1px solid #d9cfb8; padding-bottom: 6px; margin-bottom: 16px; }
+    #zone-pdf .corrige { margin-bottom: 10px; font-size: 14px; line-height: 1.55; }
+    #zone-pdf .corrige .num { font-weight: 500; color: #1e3a5f; font-size: 14px; }
+    #zone-pdf .corrige .texte { color: #4a443c; }
+    /* KaTeX : assurer une taille uniforme entre formules et texte */
+    #zone-pdf .katex { font-size: 1em !important; }
+    #zone-pdf .pied-pdf { margin-top: 30px; padding-top: 10px; border-top: 1px solid #d9cfb8; font-size: 11px; color: #6b6359; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Générateur d'automatismes</h1>
+  <p class="intro">Composez votre fiche en cochant les thèmes au niveau de précision souhaité. Un thème principal coché tirera des questions équilibrées dans toutes ses sous-catégories. Pour cibler plus finement, déroulez l'arborescence.</p>
+  <div class="formulaire">
+    <div class="bloc">
+      <div class="bloc-titre">Niveau de difficulté</div>
+      <div class="difficulte">
+        <label><input type="radio" name="difficulte" value="1"> <span class="etoiles">★</span> Facile</label>
+        <label><input type="radio" name="difficulte" value="2" checked> <span class="etoiles">★★</span> Moyen</label>
+        <label><input type="radio" name="difficulte" value="3"> <span class="etoiles">★★★</span> Difficile</label>
+      </div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-titre">Thèmes à inclure</div>
+      <div class="actions-rapides">
+        <button type="button" class="bouton-petit" id="btn-tout-deplier">Tout déplier</button>
+        <button type="button" class="bouton-petit" id="btn-tout-replier">Tout replier</button>
+        <button type="button" class="bouton-petit" id="btn-tout-decocher">Tout décocher</button>
+      </div>
+      <div id="arbre" class="arbre"></div>
+    </div>
+    <div class="total">
+      <span>Total : <span id="total-questions">0</span> question<span id="total-s"></span></span>
+      <span><span class="etoiles" id="etoiles-affichees">★★</span></span>
+    </div>
+    <div class="bloc" style="margin-top: 1.25rem;">
+      <div class="bloc-titre">Options du PDF</div>
+      <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+        <input type="checkbox" id="corriges" checked>
+        Inclure les corrigés en fin de PDF
+      </label>
+    </div>
+    <button id="bouton-generer" class="bouton" style="margin-top: 1.25rem;">Générer mon PDF</button>
+    <div id="message" class="message"></div>
+  </div>
+  <a href="../" class="retour-site">← Retour au site LaboMath</a>
+</div>
+<div id="apercu-pdf"><div id="zone-pdf"></div></div>
+
+<script>
+const ARBRE = [
+  { id: 'prerequis', titre: 'PRÉREQUIS DU COLLÈGE', enfants: [
+    { id: 'calcul_mental', titre: 'Calcul mental', enfants: [
+      { id: 'cm_tables', titre: 'Tables de multiplication', actif: true },
+      { id: 'cm_add', titre: 'Additions mentales', actif: true },
+      { id: 'cm_sous', titre: 'Soustractions mentales', actif: true },
+      { id: 'cm_mult10', titre: 'Multiplications par 10, 100, 0,1, 0,01', actif: true },
+      { id: 'cm_compl', titre: 'Compléments à 10, 100, 1000', actif: true }
+    ]},
+    { id: 'conversions', titre: 'Conversions', enfants: [
+      { id: 'conv_long', titre: 'Longueurs (mm, cm, m, km)', actif: true },
+      { id: 'conv_masse', titre: 'Masses (mg, g, kg, t)', actif: true },
+      { id: 'conv_cap', titre: 'Capacités (mL, cL, L)', actif: true },
+      { id: 'conv_duree', titre: 'Durées (h, min, s)', actif: true },
+      { id: 'conv_aire', titre: 'Aires (cm², m², km², ha)', actif: true },
+      { id: 'conv_vol', titre: 'Volumes (cm³, m³, L)', actif: true }
+    ]},
+    { id: 'relatifs', titre: 'Nombres relatifs', enfants: [
+      { id: 'rel_add', titre: 'Addition de relatifs', actif: true },
+      { id: 'rel_sous', titre: 'Soustraction de relatifs', actif: true },
+      { id: 'rel_mult', titre: 'Multiplication de relatifs', actif: true },
+      { id: 'rel_div', titre: 'Division de relatifs', actif: true },
+      { id: 'rel_signes', titre: 'Règles de signes', actif: true }
+    ]},
+    { id: 'priorites', titre: 'Priorités opératoires', enfants: [
+      { id: 'pri_paren', titre: 'Calcul avec parenthèses', actif: true },
+      { id: 'pri_puiss', titre: 'Calcul avec puissances', actif: true },
+      { id: 'pri_complexe', titre: 'Expressions complexes', actif: true }
+    ]},
+    { id: 'fractions_simples', titre: 'Fractions simples', enfants: [
+      { id: 'fs_add_mm', titre: 'Addition (même dénominateur)', actif: true },
+      { id: 'fs_add_diff', titre: 'Addition (dénominateurs simples)', actif: true },
+      { id: 'fs_mult', titre: 'Multiplication', actif: true },
+      { id: 'fs_simpl', titre: 'Simplification', actif: true },
+      { id: 'fs_dnb', titre: "Fraction d'un nombre", actif: true }
+    ]},
+    { id: 'ec_scient_co', titre: 'Écriture scientifique (collège)', enfants: [
+      { id: 'esc_vers', titre: 'Décimale → scientifique', actif: true },
+      { id: 'esc_de', titre: 'Scientifique → décimale', actif: true },
+      { id: 'esc_ordre', titre: 'Ordre de grandeur', actif: true }
+    ]},
+    { id: 'prop_rap', titre: 'Proportionnalité (rappels)', enfants: [
+      { id: 'pr_pct', titre: 'Pourcentages simples', actif: true },
+      { id: 'pr_ech', titre: 'Échelles', actif: true },
+      { id: 'pr_vit', titre: 'Vitesse moyenne (d = v × t)', actif: true }
+    ]},
+    { id: 'lect_tab', titre: 'Lecture de tableaux', enfants: [
+      { id: 'lt_tab', titre: 'Lecture dans un tableau', actif: true },
+      { id: 'lt_circ', titre: 'Diagramme circulaire (lecture en valeurs)', actif: true },
+      { id: 'lt_bar', titre: 'Diagramme en barres (lecture en valeurs)', actif: true }
+    ]},
+    { id: 'geom_rap', titre: 'Géométrie (rappels)', enfants: [
+      { id: 'gr_perim', titre: 'Périmètres', actif: true },
+      { id: 'gr_aire', titre: 'Aires de figures usuelles', actif: true },
+      { id: 'gr_vol', titre: 'Volumes de solides usuels', actif: true },
+      { id: 'gr_pyth', titre: 'Théorème de Pythagore (rappel)', actif: true },
+      { id: 'gr_thales', titre: 'Théorème de Thalès (rappel)', actif: true }
+    ]}
+  ]},
+  { id: 'nombres', titre: 'NOMBRES ET CALCULS', enfants: [
+    { id: 'fractions', titre: 'Fractions', enfants: [
+      { id: 'fractions_add', titre: 'Additionner deux fractions', actif: false },
+      { id: 'fractions_sous', titre: 'Soustraire deux fractions', actif: false },
+      { id: 'fractions_mult', titre: 'Multiplier deux fractions', actif: false },
+      { id: 'fractions_div', titre: 'Diviser deux fractions', actif: false },
+      { id: 'fractions_comp', titre: 'Comparer deux fractions', actif: false }
+    ]},
+    { id: 'puissances', titre: 'Puissances', enfants: [
+      { id: 'puiss_produit', titre: 'Produit de puissances', actif: false },
+      { id: 'puiss_quotient', titre: 'Quotient de puissances', actif: false },
+      { id: 'puiss_puiss', titre: "Puissance d'une puissance", actif: false },
+      { id: 'puiss_scientif', titre: 'Écriture scientifique', actif: false }
+    ]},
+    { id: 'racines', titre: 'Racines carrées', enfants: [
+      { id: 'racines_simpl', titre: 'Simplifier √a', actif: false },
+      { id: 'racines_op', titre: 'Opérations sur les racines', actif: false },
+      { id: 'racines_forme', titre: 'Mettre sous forme a√b', actif: false }
+    ]},
+    { id: 'litteral', titre: 'Calcul littéral', enfants: [
+      { id: 'lit_dev', titre: 'Développer', actif: false },
+      { id: 'lit_fact', titre: 'Factoriser', actif: false },
+      { id: 'lit_reduire', titre: 'Réduire', actif: false },
+      { id: 'lit_identites', titre: 'Identités remarquables', actif: false }
+    ]},
+    { id: 'equations', titre: 'Équations', enfants: [
+      { id: 'eq_1', titre: 'Équations du 1er degré', actif: false },
+      { id: 'eq_produit', titre: 'Équations produit', actif: false },
+      { id: 'eq_carre', titre: 'Équations x² = a', actif: false }
+    ]},
+    { id: 'inequations', titre: 'Inéquations', enfants: [
+      { id: 'ineq_1', titre: 'Inéquations du 1er degré', actif: false },
+      { id: 'ineq_signe', titre: "Signe d'une expression", actif: false }
+    ]},
+    { id: 'pourcentages', titre: 'Pourcentages', enfants: [
+      { id: 'pct_calc', titre: 'Calculer un pourcentage', actif: false },
+      { id: 'pct_evol', titre: 'Évolution', actif: false },
+      { id: 'pct_coef', titre: 'Coefficient multiplicateur', actif: false }
+    ]},
+    { id: 'proportion', titre: 'Proportionnalité', enfants: [
+      { id: 'prop_tab', titre: 'Tableau de proportionnalité', actif: false },
+      { id: 'prop_4e', titre: '4e proportionnelle', actif: false }
+    ]},
+    { id: 'intervalles', titre: 'Intervalles', enfants: [
+      { id: 'int_appart', titre: 'Appartenance', actif: false },
+      { id: 'int_op', titre: 'Union et intersection', actif: false }
+    ]}
+  ]},
+  { id: 'geometrie', titre: 'GÉOMÉTRIE', enfants: [
+    { id: 'vecteurs', titre: 'Vecteurs', enfants: [
+      { id: 'vec_coords', titre: "Coordonnées d'un vecteur", actif: false },
+      { id: 'vec_somme', titre: 'Somme de vecteurs', actif: false },
+      { id: 'vec_colin', titre: 'Colinéarité', actif: false },
+      { id: 'vec_milieu', titre: "Milieu d'un segment", actif: false },
+      { id: 'vec_norme', titre: "Norme d'un vecteur", actif: false }
+    ]},
+    { id: 'droites', titre: 'Droites du plan', enfants: [
+      { id: 'dr_cart', titre: 'Équation cartésienne', actif: false },
+      { id: 'dr_reduite', titre: 'Équation réduite', actif: false },
+      { id: 'dr_parall', titre: 'Parallélisme / perpendicularité', actif: false }
+    ]},
+    { id: 'geom_classique', titre: 'Géométrie classique', enfants: [
+      { id: 'pythagore', titre: 'Théorème de Pythagore', actif: false },
+      { id: 'thales', titre: 'Théorème de Thalès', actif: false },
+      { id: 'projete', titre: 'Projeté orthogonal', actif: false }
+    ]},
+    { id: 'trigo', titre: 'Trigonométrie', enfants: [
+      { id: 'trigo_long', titre: "Calcul d'une longueur", actif: false },
+      { id: 'trigo_angle', titre: "Calcul d'un angle", actif: false },
+      { id: 'trigo_rapports', titre: 'Identifier sin/cos/tan', actif: false }
+    ]},
+    { id: 'reperage', titre: 'Repérage', enfants: [
+      { id: 'rep_dist', titre: 'Distance entre 2 points', actif: false },
+      { id: 'rep_milieu', titre: "Milieu d'un segment", actif: false }
+    ]}
+  ]},
+  { id: 'fonctions', titre: 'FONCTIONS', enfants: [
+    { id: 'affine', titre: 'Fonction affine', enfants: [
+      { id: 'affine_image', titre: 'Calculer une image', actif: true },
+      { id: 'affine_antecedent', titre: 'Trouver un antécédent', actif: true },
+      { id: 'affine_coefs', titre: 'Identifier les coefficients', actif: true },
+      { id: 'affine_par_points', titre: 'Déterminer f à partir de 2 points', actif: true },
+      { id: 'affine_variation', titre: 'Sens de variation', actif: true }
+    ]},
+    { id: 'carre', titre: 'Fonction carré', enfants: [
+      { id: 'carre_image', titre: 'Calculer une image', actif: true },
+      { id: 'carre_antecedents', titre: 'Trouver les antécédents', actif: true },
+      { id: 'carre_comparaison', titre: 'Comparaison (positifs)', actif: true },
+      { id: 'carre_comparaison_neg', titre: 'Comparaison (négatifs)', actif: true },
+      { id: 'carre_calcul', titre: "Calcul mental d'un carré", actif: true }
+    ]},
+    { id: 'inverse', titre: 'Fonction inverse', enfants: [
+      { id: 'inv_image', titre: 'Calculer une image', actif: false },
+      { id: 'inv_eq', titre: 'Équations 1/x = a', actif: false },
+      { id: 'inv_comp', titre: "Comparaison d'inverses", actif: false }
+    ]},
+    { id: 'racine', titre: 'Fonction racine carrée', enfants: [
+      { id: 'rac_image', titre: 'Calculer une image', actif: false },
+      { id: 'rac_eq', titre: 'Équations √x = a', actif: false },
+      { id: 'rac_comp', titre: 'Comparaison', actif: false }
+    ]},
+    { id: 'cube', titre: 'Fonction cube', enfants: [
+      { id: 'cube_image', titre: 'Calculer une image', actif: false },
+      { id: 'cube_var', titre: 'Sens de variation', actif: false }
+    ]},
+    { id: 'gen_fonctions', titre: 'Généralités sur les fonctions', enfants: [
+      { id: 'gen_image_ant', titre: 'Image et antécédent', actif: false },
+      { id: 'gen_graphique', titre: 'Lecture graphique', actif: false },
+      { id: 'gen_variations', titre: 'Lecture de variations', actif: false }
+    ]}
+  ]},
+  { id: 'stats', titre: 'STATISTIQUES ET PROBABILITÉS', enfants: [
+    { id: 'indicateurs', titre: 'Indicateurs statistiques', enfants: [
+      { id: 'stat_moy', titre: 'Moyenne', actif: false },
+      { id: 'stat_med', titre: 'Médiane', actif: false },
+      { id: 'stat_etend', titre: 'Étendue', actif: false },
+      { id: 'stat_quart', titre: 'Quartiles', actif: false }
+    ]},
+    { id: 'probas', titre: 'Probabilités élémentaires', enfants: [
+      { id: 'pr_equi', titre: 'Équiprobabilité', actif: false },
+      { id: 'pr_union', titre: "Réunion d'évènements", actif: false },
+      { id: 'pr_inter', titre: 'Intersection', actif: false }
+    ]},
+    { id: 'frequences', titre: 'Fréquences', enfants: [
+      { id: 'freq_simple', titre: 'Fréquence simple', actif: false },
+      { id: 'freq_cum', titre: 'Fréquence cumulée', actif: false }
+    ]}
+  ]}
+];
+
+const etat = {};
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function randNonZero(min, max) { let n = 0; while (n === 0) n = rand(min, max); return n; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+const bornes = {
+  1: { aff_a: [1, 5], aff_b: [0, 9], aff_x: [1, 5], carre_x: [1, 6], carre_n: [2, 6], comp: [1, 6] },
+  2: { aff_a: [-5, 5], aff_b: [-8, 8], aff_x: [-4, 4], carre_x: [-9, 9], carre_n: [2, 9], comp: [1, 9] },
+  3: { aff_a: [-9, 9], aff_b: [-12, 12], aff_x: [-7, 7], carre_x: [-12, 12], carre_n: [2, 14], comp: [1, 12] }
+};
+
+const generateurs = {
+  affine_image: (d) => {
+    const B = bornes[d];
+    const a = randNonZero(B.aff_a[0], B.aff_a[1]);
+    const b = rand(B.aff_b[0], B.aff_b[1]);
+    const x = randNonZero(B.aff_x[0], B.aff_x[1]);
+    const r = a * x + b;
+    return { enonce: `Soit $f(x) = ${a}x ${b >= 0 ? '+' : ''} ${b}$. Calculer $f(${x})$.`,
+             corrige: `$f(${x}) = ${a} \\times ${x} ${b >= 0 ? '+' : ''} ${b} = ${a*x} ${b >= 0 ? '+' : ''} ${b} = ${r}$.` };
+  },
+  affine_antecedent: (d) => {
+    const B = bornes[d];
+    const a = randNonZero(B.aff_a[0], B.aff_a[1]);
+    const b = rand(B.aff_b[0], B.aff_b[1]);
+    const xc = randNonZero(B.aff_x[0], B.aff_x[1]);
+    const k = a * xc + b;
+    return { enonce: `Soit $f(x) = ${a}x ${b >= 0 ? '+' : ''} ${b}$. Résoudre $f(x) = ${k}$.`,
+             corrige: `$${a}x ${b >= 0 ? '+' : ''} ${b} = ${k}$ donne $${a}x = ${k - b}$ soit $x = \\dfrac{${k-b}}{${a}} = ${xc}$.` };
+  },
+  affine_coefs: (d) => {
+    const B = bornes[d];
+    const a = randNonZero(B.aff_a[0], B.aff_a[1]);
+    const b = rand(B.aff_b[0], B.aff_b[1]);
+    return { enonce: `Donner le coefficient directeur et l'ordonnée à l'origine de $f(x) = ${a}x ${b >= 0 ? '+' : ''} ${b}$.`,
+             corrige: `Coefficient directeur : $${a}$. Ordonnée à l'origine : $${b}$.` };
+  },
+  affine_par_points: (d) => {
+    const B = bornes[d];
+    const a = randNonZero(B.aff_a[0], B.aff_a[1]);
+    const b = rand(B.aff_b[0], B.aff_b[1]);
+    const x1 = randNonZero(B.aff_x[0], B.aff_x[1]);
+    let x2 = randNonZero(B.aff_x[0], B.aff_x[1]);
+    while (x2 === x1) x2 = randNonZero(B.aff_x[0], B.aff_x[1]);
+    const y1 = a*x1 + b;
+    const y2 = a*x2 + b;
+    return { enonce: `Une fonction affine $f$ vérifie $f(${x1}) = ${y1}$ et $f(${x2}) = ${y2}$. Déterminer son expression.`,
+             corrige: `$a = \\dfrac{${y2} - (${y1})}{${x2} - (${x1})} = ${a}$. Puis $f(${x1}) = ${y1}$ donne $b = ${b}$. Donc $f(x) = ${a}x ${b >= 0 ? '+' : ''} ${b}$.` };
+  },
+  affine_variation: (d) => {
+    const B = bornes[d];
+    const a = randNonZero(B.aff_a[0], B.aff_a[1]);
+    const b = rand(B.aff_b[0], B.aff_b[1]);
+    const sens = a > 0 ? 'croissante' : 'décroissante';
+    return { enonce: `Donner le sens de variation de $f(x) = ${a}x ${b >= 0 ? '+' : ''} ${b}$ sur $\\mathbb{R}$.`,
+             corrige: `Le coefficient directeur $${a}$ est ${a > 0 ? 'positif' : 'négatif'}, donc $f$ est ${sens} sur $\\mathbb{R}$.` };
+  },
+  carre_image: (d) => {
+    const B = bornes[d];
+    const x = randNonZero(B.carre_x[0], B.carre_x[1]);
+    return { enonce: `Soit $f(x) = x^2$. Calculer $f(${x})$.`, corrige: `$f(${x}) = (${x})^2 = ${x*x}$.` };
+  },
+  carre_antecedents: (d) => {
+    const B = bornes[d];
+    const n = rand(B.carre_n[0], B.carre_n[1]);
+    const c = n * n;
+    return { enonce: `Résoudre dans $\\mathbb{R}$ l'équation $x^2 = ${c}$.`,
+             corrige: `$x = ${n}$ ou $x = -${n}$. Solutions : $\\{-${n}\\,;\\,${n}\\}$.` };
+  },
+  carre_comparaison: (d) => {
+    const B = bornes[d];
+    let a = rand(B.comp[0], B.comp[1]);
+    let b = rand(B.comp[0], B.comp[1]);
+    while (b === a) b = rand(B.comp[0], B.comp[1]);
+    if (a > b) [a, b] = [b, a];
+    return { enonce: `Comparer $${a}^2$ et $${b}^2$ sans calculer (justifier).`,
+             corrige: `La fonction carré est croissante sur $[0\\,;\\,+\\infty[$. Comme $0 < ${a} < ${b}$, on a $${a}^2 < ${b}^2$ ($${a*a} < ${b*b}$).` };
+  },
+  carre_comparaison_neg: (d) => {
+    const B = bornes[d];
+    let a = -rand(B.comp[0], B.comp[1]);
+    let b = -rand(B.comp[0], B.comp[1]);
+    while (b === a) b = -rand(B.comp[0], B.comp[1]);
+    if (a > b) [a, b] = [b, a];
+    return { enonce: `Comparer $(${a})^2$ et $(${b})^2$ sans calculer (justifier).`,
+             corrige: `La fonction carré est décroissante sur $]-\\infty\\,;\\,0]$. Comme $${a} < ${b} \\le 0$, on a $(${a})^2 > (${b})^2$ ($${a*a} > ${b*b}$).` };
+  },
+  carre_calcul: (d) => {
+    const v = (d === 1)
+      ? [() => { const x = rand(11, 15); return { enonce: `Calculer $${x}^2$.`, corrige: `$${x*x}$.` }; },
+         () => { const x = rand(2, 9); return { enonce: `Calculer $${x}^2$.`, corrige: `$${x*x}$.` }; }]
+      : (d === 2)
+      ? [() => { const x = rand(11, 19); return { enonce: `Calculer $${x}^2$.`, corrige: `$${x*x}$.` }; },
+         () => { const x = rand(21, 29); return { enonce: `Calculer $${x}^2$.`, corrige: `$${x*x}$.` }; },
+         () => { const x = -rand(2, 12); return { enonce: `Calculer $(${x})^2$.`, corrige: `$${x*x}$.` }; }]
+      : [() => { const x = rand(21, 39); return { enonce: `Calculer $${x}^2$.`, corrige: `$${x*x}$.` }; },
+         () => { const x = -rand(11, 19); return { enonce: `Calculer $(${x})^2$.`, corrige: `$${x*x}$.` }; },
+         () => { const dem = pick([0.5, 1.5, 2.5, 3.5, 4.5]); return { enonce: `Calculer $(${dem})^2$.`, corrige: `$${(dem*dem).toFixed(2).replace(/\.?0+$/, '')}$.` }; }];
+    return pick(v)();
+  },
+
+  /* ===== LOT 1 — CALCUL MENTAL ===== */
+
+  // 1. Tables de multiplication
+  cm_tables: (d) => {
+    // Facile : tables 2 à 5 / Moyen : 2 à 10 / Difficile : 2 à 12
+    const max = (d === 1) ? 5 : (d === 2) ? 10 : 12;
+    const a = rand(2, max);
+    const b = rand(2, max);
+    return {
+      enonce: `Calculer $${a} \\times ${b}$.`,
+      corrige: `$${a} \\times ${b} = ${a*b}$.`
+    };
+  },
+
+  // 2. Additions mentales
+  cm_add: (d) => {
+    // Facile : entiers < 50 / Moyen : entiers ou décimaux < 100 / Difficile : décimaux à 1 chiffre
+    if (d === 1) {
+      const a = rand(10, 50);
+      const b = rand(10, 50);
+      return { enonce: `Calculer $${a} + ${b}$.`, corrige: `$${a} + ${b} = ${a+b}$.` };
+    } else if (d === 2) {
+      const variantes = [
+        () => { const a = rand(50, 99); const b = rand(50, 99); return { enonce: `Calculer $${a} + ${b}$.`, corrige: `$${a+b}$.` }; },
+        () => { const a = rand(10, 50) + 0.5; const b = rand(10, 50) + 0.5; return { enonce: `Calculer $${a} + ${b}$.`, corrige: `$${a+b}$.` }; }
+      ];
+      return pick(variantes)();
+    } else {
+      const a = (rand(20, 99) + rand(1, 9)/10);
+      const b = (rand(20, 99) + rand(1, 9)/10);
+      return { enonce: `Calculer $${a.toFixed(1)} + ${b.toFixed(1)}$.`, corrige: `$${(a+b).toFixed(1)}$.` };
+    }
+  },
+
+  // 3. Soustractions mentales
+  cm_sous: (d) => {
+    if (d === 1) {
+      const a = rand(20, 50);
+      const b = rand(5, a - 5);
+      return { enonce: `Calculer $${a} - ${b}$.`, corrige: `$${a-b}$.` };
+    } else if (d === 2) {
+      const variantes = [
+        () => { const a = rand(50, 99); const b = rand(20, a-10); return { enonce: `Calculer $${a} - ${b}$.`, corrige: `$${a-b}$.` }; },
+        () => { const a = rand(10, 30); const b = rand(a+5, a+20); return { enonce: `Calculer $${a} - ${b}$.`, corrige: `$${a-b}$.` }; }
+      ];
+      return pick(variantes)();
+    } else {
+      const variantes = [
+        () => { const a = rand(20, 99) + rand(1,9)/10; const b = rand(5, 30) + rand(1,9)/10; return { enonce: `Calculer $${a.toFixed(1)} - ${b.toFixed(1)}$.`, corrige: `$${(a-b).toFixed(1)}$.` }; },
+        () => { const a = rand(10, 30); const b = rand(a+5, a+30); return { enonce: `Calculer $${a} - ${b}$.`, corrige: `$${a-b}$.` }; }
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  // 4. Multiplications par 10, 100, 0,1, 0,01
+  cm_mult10: (d) => {
+    const facteurs = (d === 1) ? [10, 100]
+                   : (d === 2) ? [10, 100, 1000, 0.1, 0.01]
+                   :             [10, 100, 1000, 10000, 0.1, 0.01, 0.001];
+    const f = pick(facteurs);
+    // Choisir un nombre pour multiplier
+    const n_entier = rand(2, 99);
+    const n_decimal = (rand(1, 99) + rand(1, 99)/100);
+    const n = (d === 1) ? n_entier
+            : pick([n_entier, parseFloat(n_decimal.toFixed(2))]);
+    const r = parseFloat((n * f).toPrecision(12));
+    return {
+      enonce: `Calculer $${n} \\times ${f}$.`,
+      corrige: `$${n} \\times ${f} = ${r}$.`
+    };
+  },
+
+  // 5. Compléments à 10, 100, 1000
+  cm_compl: (d) => {
+    const cible = (d === 1) ? 10
+                : (d === 2) ? pick([10, 100])
+                :             pick([100, 1000]);
+    let n;
+    if (cible === 10) n = rand(1, 9);
+    else if (cible === 100) n = rand(11, 99);
+    else n = rand(101, 999);
+    return {
+      enonce: `Quel nombre faut-il ajouter à $${n}$ pour obtenir $${cible}$ ?`,
+      corrige: `Il faut ajouter $${cible - n}$ (car $${n} + ${cible - n} = ${cible}$).`
+    };
+  },
+
+  /* ===== LOT 1 — CONVERSIONS ===== */
+
+  // 6. Conversions de longueurs
+  conv_long: (d) => {
+    const unites = ['mm', 'cm', 'm', 'km'];
+    const facteurs = { mm: 0.001, cm: 0.01, m: 1, km: 1000 };
+    // Facile : mm↔cm, cm↔m / Moyen : tous sauf km↔mm / Difficile : km↔mm
+    let depart, arrivee;
+    if (d === 1) {
+      const choix = pick([['mm','cm'], ['cm','m'], ['m','cm'], ['cm','mm']]);
+      [depart, arrivee] = choix;
+    } else if (d === 2) {
+      const choix = pick([['mm','m'], ['cm','m'], ['m','km'], ['km','m'], ['m','mm']]);
+      [depart, arrivee] = choix;
+    } else {
+      const choix = pick([['mm','km'], ['km','mm'], ['mm','m'], ['km','cm'], ['cm','km']]);
+      [depart, arrivee] = choix;
+    }
+    const valeur = (d === 1) ? rand(1, 99) : (rand(1, 999) + rand(0,99)/100);
+    const valeurAff = (d === 1) ? valeur : parseFloat(valeur.toFixed(2));
+    const resultat = parseFloat((valeurAff * facteurs[depart] / facteurs[arrivee]).toPrecision(10));
+    return {
+      enonce: `Convertir : $${valeurAff}$ ${depart} = … ${arrivee}.`,
+      corrige: `$${valeurAff}$ ${depart} $= ${resultat}$ ${arrivee}.`
+    };
+  },
+
+  // 7. Conversions de masses
+  conv_masse: (d) => {
+    const unites = ['mg', 'g', 'kg', 't'];
+    const facteurs = { mg: 0.000001, g: 0.001, kg: 1, t: 1000 };
+    let depart, arrivee;
+    if (d === 1) {
+      const choix = pick([['g','kg'], ['kg','g'], ['mg','g'], ['g','mg']]);
+      [depart, arrivee] = choix;
+    } else if (d === 2) {
+      const choix = pick([['mg','kg'], ['kg','mg'], ['g','t'], ['t','g'], ['mg','g']]);
+      [depart, arrivee] = choix;
+    } else {
+      const choix = pick([['mg','t'], ['t','mg'], ['mg','kg'], ['t','g']]);
+      [depart, arrivee] = choix;
+    }
+    const valeur = (d === 1) ? rand(1, 99) : (rand(1, 999) + rand(0,99)/100);
+    const valeurAff = (d === 1) ? valeur : parseFloat(valeur.toFixed(2));
+    const resultat = parseFloat((valeurAff * facteurs[depart] / facteurs[arrivee]).toPrecision(10));
+    return {
+      enonce: `Convertir : $${valeurAff}$ ${depart} = … ${arrivee}.`,
+      corrige: `$${valeurAff}$ ${depart} $= ${resultat}$ ${arrivee}.`
+    };
+  },
+
+  // 8. Conversions de capacités
+  conv_cap: (d) => {
+    const facteurs = { mL: 0.001, cL: 0.01, dL: 0.1, L: 1 };
+    let depart, arrivee;
+    if (d === 1) {
+      const choix = pick([['mL','cL'], ['cL','L'], ['L','cL'], ['cL','mL']]);
+      [depart, arrivee] = choix;
+    } else if (d === 2) {
+      const choix = pick([['mL','L'], ['L','mL'], ['dL','L'], ['L','dL']]);
+      [depart, arrivee] = choix;
+    } else {
+      const choix = pick([['mL','L'], ['L','mL'], ['mL','dL'], ['dL','mL']]);
+      [depart, arrivee] = choix;
+    }
+    const valeur = (d === 1) ? rand(1, 99) : (rand(1, 999) + rand(0,99)/100);
+    const valeurAff = (d === 1) ? valeur : parseFloat(valeur.toFixed(2));
+    const resultat = parseFloat((valeurAff * facteurs[depart] / facteurs[arrivee]).toPrecision(10));
+    return {
+      enonce: `Convertir : $${valeurAff}$ ${depart} = … ${arrivee}.`,
+      corrige: `$${valeurAff}$ ${depart} $= ${resultat}$ ${arrivee}.`
+    };
+  },
+
+  // 9. Conversions de durées
+  conv_duree: (d) => {
+    const variantes = (d === 1) ? [
+      () => { const m = rand(2, 9); return { enonce: `Combien de minutes dans $${m}$ heures ?`, corrige: `$${m} \\times 60 = ${m*60}$ min.` }; },
+      () => { const m = rand(60, 300); return { enonce: `Convertir $${m}$ secondes en minutes.`, corrige: `$${m} : 60 = ${Math.floor(m/60)}$ min $${m%60}$ s.` }; }
+    ] : (d === 2) ? [
+      () => { const h = rand(1, 5); const m = rand(10, 50); return { enonce: `Convertir $${h}$ h $${m}$ min en minutes.`, corrige: `$${h} \\times 60 + ${m} = ${h*60+m}$ min.` }; },
+      () => { const tot = rand(120, 600); return { enonce: `Convertir $${tot}$ minutes en heures et minutes.`, corrige: `$${tot} : 60 = ${Math.floor(tot/60)}$ h $${tot%60}$ min.` }; },
+      () => { const min = rand(2, 9); return { enonce: `Combien de secondes dans $${min}$ minutes ?`, corrige: `$${min} \\times 60 = ${min*60}$ s.` }; }
+    ] : [
+      () => { const h = rand(1, 5); const m = rand(10, 59); const s = rand(10, 59); return { enonce: `Convertir $${h}$ h $${m}$ min $${s}$ s en secondes.`, corrige: `$${h*3600+m*60+s}$ s.` }; },
+      () => { const sec = rand(3700, 9999); const h = Math.floor(sec/3600); const m = Math.floor((sec%3600)/60); const s = sec%60; return { enonce: `Convertir $${sec}$ s en heures, minutes, secondes.`, corrige: `$${h}$ h $${m}$ min $${s}$ s.` }; }
+    ];
+    return pick(variantes)();
+  },
+
+  // 10. Conversions d'aires (relation entre unités plus délicate : ×100 entre chaque)
+  conv_aire: (d) => {
+    const facteurs = { 'mm²': 0.000001, 'cm²': 0.0001, 'dm²': 0.01, 'm²': 1, 'a': 100, 'ha': 10000, 'km²': 1000000 };
+    let depart, arrivee;
+    if (d === 1) {
+      const choix = pick([['cm²','m²'], ['m²','cm²'], ['mm²','cm²'], ['cm²','mm²']]);
+      [depart, arrivee] = choix;
+    } else if (d === 2) {
+      const choix = pick([['m²','ha'], ['ha','m²'], ['a','m²'], ['m²','a'], ['km²','m²']]);
+      [depart, arrivee] = choix;
+    } else {
+      const choix = pick([['m²','km²'], ['km²','m²'], ['ha','km²'], ['mm²','m²'], ['cm²','km²']]);
+      [depart, arrivee] = choix;
+    }
+    const valeur = (d === 1) ? rand(1, 99) : (rand(1, 999) + rand(0,99)/100);
+    const valeurAff = (d === 1) ? valeur : parseFloat(valeur.toFixed(2));
+    const resultat = parseFloat((valeurAff * facteurs[depart] / facteurs[arrivee]).toPrecision(10));
+    return {
+      enonce: `Convertir : $${valeurAff}$ ${depart} = … ${arrivee}.`,
+      corrige: `$${valeurAff}$ ${depart} $= ${resultat}$ ${arrivee}.`
+    };
+  },
+
+  // 11. Conversions de volumes (avec correspondance L ↔ dm³ qui est essentielle)
+  conv_vol: (d) => {
+    const variantes = (d === 1) ? [
+      () => { const v = rand(1, 99); return { enonce: `Convertir $${v}$ dm³ en litres.`, corrige: `$1$ dm³ $= 1$ L, donc $${v}$ dm³ $= ${v}$ L.` }; },
+      () => { const v = rand(1, 99); return { enonce: `Convertir $${v}$ L en dm³.`, corrige: `$${v}$ L $= ${v}$ dm³.` }; },
+      () => { const v = rand(2, 9); return { enonce: `Convertir $${v}$ m³ en L.`, corrige: `$1$ m³ $= 1000$ L, donc $${v}$ m³ $= ${v*1000}$ L.` }; }
+    ] : (d === 2) ? [
+      () => { const v = rand(100, 9999); return { enonce: `Convertir $${v}$ cm³ en L.`, corrige: `$1000$ cm³ $= 1$ L, donc $${v}$ cm³ $= ${v/1000}$ L.` }; },
+      () => { const v = (rand(1, 99) + rand(0,9)/10); return { enonce: `Convertir $${v.toFixed(1)}$ L en mL.`, corrige: `$${v.toFixed(1)}$ L $= ${(v*1000)}$ mL.` }; },
+      () => { const v = rand(2, 9); return { enonce: `Convertir $${v}$ m³ en dm³.`, corrige: `$${v}$ m³ $= ${v*1000}$ dm³.` }; }
+    ] : [
+      () => { const v = (rand(1, 99) + rand(0,9)/10); return { enonce: `Convertir $${v.toFixed(1)}$ m³ en cm³.`, corrige: `$${v.toFixed(1)}$ m³ $= ${v*1000000}$ cm³.` }; },
+      () => { const v = rand(10, 999); return { enonce: `Convertir $${v}$ cL en cm³ (sachant que $1$ cL $= 10$ cm³).`, corrige: `$${v}$ cL $= ${v*10}$ cm³.` }; },
+      () => { const v = (rand(1, 9) + rand(0,9)/10); return { enonce: `Convertir $${v.toFixed(1)}$ m³ en L.`, corrige: `$${v.toFixed(1)}$ m³ $= ${v*1000}$ L.` }; }
+    ];
+    return pick(variantes)();
+  },
+
+  /* ===== LOT 2 — NOMBRES RELATIFS ===== */
+
+  // 1. Addition de relatifs
+  rel_add: (d) => {
+    let a, b;
+    if (d === 1) {
+      // Facile : un seul des deux est négatif, valeurs petites
+      a = pick([rand(2, 9), -rand(2, 9)]);
+      b = pick([rand(2, 9), -rand(2, 9)]);
+    } else if (d === 2) {
+      // Moyen : les deux peuvent être négatifs, valeurs moyennes
+      a = pick([rand(2, 20), -rand(2, 20)]);
+      b = pick([rand(2, 20), -rand(2, 20)]);
+    } else {
+      // Difficile : décimaux et valeurs plus grandes
+      a = pick([(rand(2, 50) + rand(0,9)/10), -(rand(2, 50) + rand(0,9)/10)]);
+      b = pick([(rand(2, 50) + rand(0,9)/10), -(rand(2, 50) + rand(0,9)/10)]);
+      a = parseFloat(a.toFixed(1));
+      b = parseFloat(b.toFixed(1));
+    }
+    const r = parseFloat((a + b).toFixed(1));
+    // Affichage joli : (+a) ou (-a), avec parenthèses si négatif
+    const affB = b < 0 ? `(${b})` : `${b}`;
+    return {
+      enonce: `Calculer $${a} + ${affB}$.`,
+      corrige: `$${a} + ${affB} = ${r}$.`
+    };
+  },
+
+  // 2. Soustraction de relatifs
+  rel_sous: (d) => {
+    let a, b;
+    if (d === 1) {
+      a = pick([rand(2, 9), -rand(2, 9)]);
+      b = pick([rand(2, 9), -rand(2, 9)]);
+    } else if (d === 2) {
+      a = pick([rand(2, 20), -rand(2, 20)]);
+      b = pick([rand(2, 20), -rand(2, 20)]);
+    } else {
+      a = pick([(rand(2, 50) + rand(0,9)/10), -(rand(2, 50) + rand(0,9)/10)]);
+      b = pick([(rand(2, 50) + rand(0,9)/10), -(rand(2, 50) + rand(0,9)/10)]);
+      a = parseFloat(a.toFixed(1));
+      b = parseFloat(b.toFixed(1));
+    }
+    const r = parseFloat((a - b).toFixed(1));
+    const affB = b < 0 ? `(${b})` : `${b}`;
+    return {
+      enonce: `Calculer $${a} - ${affB}$.`,
+      corrige: `$${a} - ${affB} = ${r}$.`
+    };
+  },
+
+  // 3. Multiplication de relatifs
+  rel_mult: (d) => {
+    let a, b;
+    if (d === 1) {
+      a = pick([rand(2, 7), -rand(2, 7)]);
+      b = pick([rand(2, 7), -rand(2, 7)]);
+    } else if (d === 2) {
+      a = pick([rand(2, 12), -rand(2, 12)]);
+      b = pick([rand(2, 12), -rand(2, 12)]);
+    } else {
+      a = pick([rand(2, 25), -rand(2, 25)]);
+      b = pick([rand(2, 15), -rand(2, 15)]);
+    }
+    const r = a * b;
+    const affA = a < 0 ? `(${a})` : `${a}`;
+    const affB = b < 0 ? `(${b})` : `${b}`;
+    return {
+      enonce: `Calculer $${affA} \\times ${affB}$.`,
+      corrige: `$${affA} \\times ${affB} = ${r}$.`
+    };
+  },
+
+  // 4. Division de relatifs
+  rel_div: (d) => {
+    // On choisit le quotient et le diviseur puis on calcule le dividende
+    // pour avoir toujours un résultat entier
+    let q, diviseur;
+    if (d === 1) {
+      q = pick([rand(2, 6), -rand(2, 6)]);
+      diviseur = pick([rand(2, 5), -rand(2, 5)]);
+    } else if (d === 2) {
+      q = pick([rand(2, 10), -rand(2, 10)]);
+      diviseur = pick([rand(2, 8), -rand(2, 8)]);
+    } else {
+      q = pick([rand(2, 20), -rand(2, 20)]);
+      diviseur = pick([rand(2, 12), -rand(2, 12)]);
+    }
+    const dividende = q * diviseur;
+    const affDividende = dividende < 0 ? `(${dividende})` : `${dividende}`;
+    const affDiviseur = diviseur < 0 ? `(${diviseur})` : `${diviseur}`;
+    return {
+      enonce: `Calculer $${affDividende} \\div ${affDiviseur}$.`,
+      corrige: `$${affDividende} \\div ${affDiviseur} = ${q}$.`
+    };
+  },
+
+  // 5. Règles de signes (déterminer le signe d'un produit/quotient)
+  rel_signes: (d) => {
+    if (d === 1) {
+      // Facile : produit de deux facteurs
+      const sa = pick(['+', '-']);
+      const sb = pick(['+', '-']);
+      const a = rand(2, 9);
+      const b = rand(2, 9);
+      const affA = sa === '-' ? `(-${a})` : `${a}`;
+      const affB = sb === '-' ? `(-${b})` : `${b}`;
+      const produit = (sa === '-' ? -a : a) * (sb === '-' ? -b : b);
+      const signeRes = produit > 0 ? 'positif' : 'négatif';
+      return {
+        enonce: `Donner le signe du produit $${affA} \\times ${affB}$ sans calculer.`,
+        corrige: `Le produit est ${signeRes} (${sa === sb ? 'même signe' : 'signes différents'}). On a $${affA} \\times ${affB} = ${produit}$.`
+      };
+    } else if (d === 2) {
+      // Moyen : produit de 3 facteurs ou quotient
+      const variantes = [
+        () => {
+          const sa = pick(['+', '-']);
+          const sb = pick(['+', '-']);
+          const sc = pick(['+', '-']);
+          const a = rand(2, 8); const b = rand(2, 8); const c = rand(2, 8);
+          const affA = sa === '-' ? `(-${a})` : `${a}`;
+          const affB = sb === '-' ? `(-${b})` : `${b}`;
+          const affC = sc === '-' ? `(-${c})` : `${c}`;
+          const nbMoins = [sa, sb, sc].filter(s => s === '-').length;
+          const signeRes = nbMoins % 2 === 0 ? 'positif' : 'négatif';
+          return {
+            enonce: `Donner le signe du produit $${affA} \\times ${affB} \\times ${affC}$ sans calculer.`,
+            corrige: `Il y a ${nbMoins} facteur${nbMoins>1?'s':''} négatif${nbMoins>1?'s':''}, donc le produit est ${signeRes} (${nbMoins} est ${nbMoins%2===0?'pair':'impair'}).`
+          };
+        }
+      ];
+      return variantes[0]();
+    } else {
+      // Difficile : 4 facteurs ou expression mixte
+      const sa = pick(['+', '-']);
+      const sb = pick(['+', '-']);
+      const sc = pick(['+', '-']);
+      const sd = pick(['+', '-']);
+      const a = rand(2, 7); const b = rand(2, 7); const c = rand(2, 7); const da = rand(2, 7);
+      const affA = sa === '-' ? `(-${a})` : `${a}`;
+      const affB = sb === '-' ? `(-${b})` : `${b}`;
+      const affC = sc === '-' ? `(-${c})` : `${c}`;
+      const affD = sd === '-' ? `(-${da})` : `${da}`;
+      const nbMoins = [sa, sb, sc, sd].filter(s => s === '-').length;
+      const signeRes = nbMoins % 2 === 0 ? 'positif' : 'négatif';
+      return {
+        enonce: `Donner le signe de $${affA} \\times ${affB} \\times ${affC} \\times ${affD}$ sans calculer.`,
+        corrige: `Il y a ${nbMoins} facteur${nbMoins>1?'s':''} négatif${nbMoins>1?'s':''}, donc le produit est ${signeRes}.`
+      };
+    }
+  },
+
+  /* ===== LOT 2 — PRIORITÉS OPÉRATOIRES ===== */
+
+  // 6. Calcul avec parenthèses
+  pri_paren: (d) => {
+    if (d === 1) {
+      // Facile : (a+b) × c ou a × (b+c)
+      const a = rand(2, 9);
+      const b = rand(2, 9);
+      const c = rand(2, 5);
+      const variantes = [
+        () => ({ enonce: `Calculer $(${a} + ${b}) \\times ${c}$.`, corrige: `$(${a} + ${b}) \\times ${c} = ${a+b} \\times ${c} = ${(a+b)*c}$.` }),
+        () => ({ enonce: `Calculer $${c} \\times (${a} + ${b})$.`, corrige: `$${c} \\times (${a} + ${b}) = ${c} \\times ${a+b} = ${c*(a+b)}$.` })
+      ];
+      return pick(variantes)();
+    } else if (d === 2) {
+      // Moyen : (a + b) × (c + d) ou avec soustractions
+      const a = rand(2, 12);
+      const b = rand(2, 12);
+      const c = rand(2, 8);
+      const da = rand(2, 8);
+      const variantes = [
+        () => ({ enonce: `Calculer $(${a} + ${b}) \\times (${c} - ${da})$.`,
+                 corrige: `$(${a} + ${b}) \\times (${c} - ${da}) = ${a+b} \\times ${c-da} = ${(a+b)*(c-da)}$.` }),
+        () => ({ enonce: `Calculer $(${a} - ${b}) \\times ${c}$.`,
+                 corrige: `$(${a} - ${b}) \\times ${c} = ${a-b} \\times ${c} = ${(a-b)*c}$.` })
+      ];
+      return pick(variantes)();
+    } else {
+      // Difficile : expressions plus complexes
+      const a = rand(2, 15);
+      const b = rand(2, 15);
+      const c = rand(2, 10);
+      const da = rand(2, 10);
+      const e = rand(2, 8);
+      const variantes = [
+        () => ({ enonce: `Calculer $${e} \\times (${a} - ${b}) + ${c} \\times ${da}$.`,
+                 corrige: `$${e} \\times (${a} - ${b}) + ${c} \\times ${da} = ${e} \\times ${a-b} + ${c*da} = ${e*(a-b)} + ${c*da} = ${e*(a-b) + c*da}$.` }),
+        () => ({ enonce: `Calculer $(${a} + ${b}) \\times (${c} - ${da}) - ${e}$.`,
+                 corrige: `$(${a} + ${b}) \\times (${c} - ${da}) - ${e} = ${a+b} \\times ${c-da} - ${e} = ${(a+b)*(c-da)} - ${e} = ${(a+b)*(c-da) - e}$.` })
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  // 7. Calcul avec puissances simples
+  pri_puiss: (d) => {
+    if (d === 1) {
+      // Facile : a² + b ou a × b²
+      const a = rand(2, 6);
+      const b = rand(2, 9);
+      const variantes = [
+        () => ({ enonce: `Calculer $${a}^2 + ${b}$.`, corrige: `$${a}^2 + ${b} = ${a*a} + ${b} = ${a*a + b}$.` }),
+        () => ({ enonce: `Calculer $${a}^2 \\times ${b}$.`, corrige: `$${a}^2 \\times ${b} = ${a*a} \\times ${b} = ${a*a*b}$.` })
+      ];
+      return pick(variantes)();
+    } else if (d === 2) {
+      // Moyen : a² + b² ou a² - b² ou a² × b - c
+      const a = rand(2, 9);
+      const b = rand(2, 7);
+      const c = rand(2, 9);
+      const variantes = [
+        () => ({ enonce: `Calculer $${a}^2 + ${b}^2$.`, corrige: `$${a}^2 + ${b}^2 = ${a*a} + ${b*b} = ${a*a + b*b}$.` }),
+        () => ({ enonce: `Calculer $${a}^2 - ${b}^2$.`, corrige: `$${a}^2 - ${b}^2 = ${a*a} - ${b*b} = ${a*a - b*b}$.` }),
+        () => ({ enonce: `Calculer $${a}^2 \\times ${b} - ${c}$.`, corrige: `$${a}^2 \\times ${b} - ${c} = ${a*a} \\times ${b} - ${c} = ${a*a*b} - ${c} = ${a*a*b - c}$.` })
+      ];
+      return pick(variantes)();
+    } else {
+      // Difficile : 2 × a² - b × c ou (a + b)² - c²
+      const a = rand(2, 9);
+      const b = rand(2, 7);
+      const c = rand(2, 9);
+      const variantes = [
+        () => ({ enonce: `Calculer $2 \\times ${a}^2 - ${b} \\times ${c}$.`, corrige: `$2 \\times ${a}^2 - ${b} \\times ${c} = 2 \\times ${a*a} - ${b*c} = ${2*a*a} - ${b*c} = ${2*a*a - b*c}$.` }),
+        () => ({ enonce: `Calculer $(${a} + ${b})^2 - ${c}^2$.`, corrige: `$(${a} + ${b})^2 - ${c}^2 = ${a+b}^2 - ${c*c} = ${(a+b)*(a+b)} - ${c*c} = ${(a+b)*(a+b) - c*c}$.` })
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  // 8. Expressions complexes (combinant tout)
+  pri_complexe: (d) => {
+    if (d === 1) {
+      // Facile : a + b × c
+      const a = rand(2, 9);
+      const b = rand(2, 6);
+      const c = rand(2, 6);
+      return {
+        enonce: `Calculer $${a} + ${b} \\times ${c}$.`,
+        corrige: `On effectue d'abord la multiplication : $${a} + ${b} \\times ${c} = ${a} + ${b*c} = ${a + b*c}$.`
+      };
+    } else if (d === 2) {
+      // Moyen : a × b + c × d ou a × (b + c) - d
+      const a = rand(2, 9);
+      const b = rand(2, 7);
+      const c = rand(2, 9);
+      const da = rand(2, 6);
+      const variantes = [
+        () => ({ enonce: `Calculer $${a} \\times ${b} + ${c} \\times ${da}$.`,
+                 corrige: `$${a} \\times ${b} + ${c} \\times ${da} = ${a*b} + ${c*da} = ${a*b + c*da}$.` }),
+        () => ({ enonce: `Calculer $${a} \\times (${b} + ${c}) - ${da}$.`,
+                 corrige: `$${a} \\times (${b} + ${c}) - ${da} = ${a} \\times ${b+c} - ${da} = ${a*(b+c)} - ${da} = ${a*(b+c) - da}$.` })
+      ];
+      return pick(variantes)();
+    } else {
+      // Difficile : combinaisons avec puissances et parenthèses
+      const a = rand(2, 7);
+      const b = rand(2, 9);
+      const c = rand(2, 6);
+      const da = rand(2, 5);
+      const variantes = [
+        () => ({ enonce: `Calculer $${a}^2 + ${b} \\times (${c} - ${da})$.`,
+                 corrige: `$${a}^2 + ${b} \\times (${c} - ${da}) = ${a*a} + ${b} \\times ${c-da} = ${a*a} + ${b*(c-da)} = ${a*a + b*(c-da)}$.` }),
+        () => ({ enonce: `Calculer $(${a} + ${b}) \\times ${c} - ${da}^2$.`,
+                 corrige: `$(${a} + ${b}) \\times ${c} - ${da}^2 = ${a+b} \\times ${c} - ${da*da} = ${(a+b)*c} - ${da*da} = ${(a+b)*c - da*da}$.` })
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  /* ===== LOT 3 — FRACTIONS SIMPLES (collège) ===== */
+
+  // 1. Addition mêmes dénominateurs
+  fs_add_mm: (d) => {
+    let den, a, b;
+    if (d === 1) { den = pick([3, 4, 5, 6, 8]); a = rand(1, den-1); b = rand(1, den-1); }
+    else if (d === 2) { den = pick([5, 6, 7, 8, 9, 10, 12]); a = rand(1, den+2); b = rand(1, den+2); }
+    else { den = pick([7, 9, 11, 12, 15]); a = rand(2, 2*den); b = rand(2, 2*den); }
+    const num = a + b;
+    // Simplification
+    function pgcd(x,y){x=Math.abs(x);y=Math.abs(y);while(y){[x,y]=[y,x%y];}return x;}
+    const g = pgcd(num, den);
+    let corrigeFin = '';
+    if (g > 1) {
+      corrigeFin = ` = \\dfrac{${num/g}}{${den/g}}`;
+    }
+    return {
+      enonce: `Calculer $\\dfrac{${a}}{${den}} + \\dfrac{${b}}{${den}}$.`,
+      corrige: `On garde le dénominateur et on ajoute les numérateurs : $\\dfrac{${a}}{${den}} + \\dfrac{${b}}{${den}} = \\dfrac{${num}}{${den}}${corrigeFin}$.`
+    };
+  },
+
+  // 2. Addition dénominateurs simples (l'un est multiple de l'autre)
+  fs_add_diff: (d) => {
+    // On choisit deux dénominateurs où l'un divise l'autre, pour faciliter
+    let den1, den2;
+    if (d === 1) { const pairs = [[2,4],[2,6],[2,8],[3,6],[3,9],[4,8],[5,10]]; [den1, den2] = pick(pairs); }
+    else if (d === 2) { const pairs = [[2,4],[2,6],[3,6],[4,8],[5,10],[3,12],[4,12],[6,12]]; [den1, den2] = pick(pairs); }
+    else { const pairs = [[3,4],[2,5],[3,5],[4,5],[3,7],[2,7],[5,6]]; [den1, den2] = pick(pairs); }
+    const a = rand(1, den1-1);
+    const b = rand(1, den2-1);
+    function pgcd(x,y){x=Math.abs(x);y=Math.abs(y);while(y){[x,y]=[y,x%y];}return x;}
+    const denCom = den1 * den2 / pgcd(den1, den2);
+    const aN = a * denCom / den1;
+    const bN = b * denCom / den2;
+    const num = aN + bN;
+    const g = pgcd(num, denCom);
+    let etape3 = '';
+    if (g > 1) {
+      etape3 = ` = \\dfrac{${num/g}}{${denCom/g}}`;
+    }
+    return {
+      enonce: `Calculer $\\dfrac{${a}}{${den1}} + \\dfrac{${b}}{${den2}}$.`,
+      corrige: `On met au même dénominateur ($${denCom}$) : $\\dfrac{${a}}{${den1}} + \\dfrac{${b}}{${den2}} = \\dfrac{${aN}}{${denCom}} + \\dfrac{${bN}}{${denCom}} = \\dfrac{${num}}{${denCom}}${etape3}$.`
+    };
+  },
+
+  // 3. Multiplication de fractions
+  fs_mult: (d) => {
+    let a, b, c, e;
+    if (d === 1) { a = rand(1, 5); b = pick([2,3,4,5]); c = rand(1, 5); e = pick([2,3,4,5]); }
+    else if (d === 2) { a = rand(1, 9); b = pick([3,4,5,6,7,8]); c = rand(1, 9); e = pick([3,4,5,6,7,8]); }
+    else { a = rand(2, 12); b = pick([5,6,7,8,9,11]); c = rand(2, 12); e = pick([5,6,7,8,9,11]); }
+    const num = a * c;
+    const den = b * e;
+    function pgcd(x,y){x=Math.abs(x);y=Math.abs(y);while(y){[x,y]=[y,x%y];}return x;}
+    const g = pgcd(num, den);
+    let etape2 = '';
+    if (g > 1) {
+      etape2 = ` = \\dfrac{${num/g}}{${den/g}}`;
+    }
+    return {
+      enonce: `Calculer $\\dfrac{${a}}{${b}} \\times \\dfrac{${c}}{${e}}$.`,
+      corrige: `On multiplie les numérateurs entre eux et les dénominateurs entre eux : $\\dfrac{${a}}{${b}} \\times \\dfrac{${c}}{${e}} = \\dfrac{${num}}{${den}}${etape2}$.`
+    };
+  },
+
+  // 4. Simplification d'une fraction
+  fs_simpl: (d) => {
+    function pgcd(x,y){x=Math.abs(x);y=Math.abs(y);while(y){[x,y]=[y,x%y];}return x;}
+    let num, den;
+    if (d === 1) {
+      // PGCD petit (2, 3, 4, 5)
+      const g = pick([2, 3, 4, 5]);
+      num = g * rand(2, 7);
+      den = g * rand(2, 7);
+      while (num === den) den = g * rand(2, 7);
+    } else if (d === 2) {
+      const g = pick([3, 4, 5, 6, 7, 8]);
+      num = g * rand(2, 9);
+      den = g * rand(2, 9);
+      while (num === den) den = g * rand(2, 9);
+    } else {
+      // Difficile : PGCD plus grand
+      const g = pick([6, 8, 9, 12, 14, 15]);
+      num = g * rand(2, 9);
+      den = g * rand(2, 9);
+      while (num === den) den = g * rand(2, 9);
+    }
+    const g = pgcd(num, den);
+    return {
+      enonce: `Simplifier la fraction $\\dfrac{${num}}{${den}}$.`,
+      corrige: `Le PGCD de $${num}$ et $${den}$ est $${g}$. On divise par $${g}$ : $\\dfrac{${num}}{${den}} = \\dfrac{${num/g}}{${den/g}}$.`
+    };
+  },
+
+  // 5. Fraction d'un nombre
+  fs_dnb: (d) => {
+    let num, den, n;
+    if (d === 1) {
+      // Le résultat tombe juste, fractions simples
+      den = pick([2, 3, 4, 5]);
+      num = rand(1, den-1);
+      n = den * rand(2, 10);
+    } else if (d === 2) {
+      den = pick([3, 4, 5, 6, 8, 10]);
+      num = rand(1, den-1);
+      n = den * rand(2, 15);
+    } else {
+      den = pick([5, 6, 7, 8, 9, 12]);
+      num = rand(1, den-1);
+      n = den * rand(2, 20);
+    }
+    const r = num * n / den;
+    return {
+      enonce: `Calculer $\\dfrac{${num}}{${den}}$ de $${n}$.`,
+      corrige: `$\\dfrac{${num}}{${den}} \\times ${n} = \\dfrac{${num} \\times ${n}}{${den}} = \\dfrac{${num*n}}{${den}} = ${r}$.`
+    };
+  },
+
+  /* ===== LOT 4 — ÉCRITURE SCIENTIFIQUE (collège) ===== */
+
+  // Convertir un décimal en écriture scientifique
+  esc_vers: (d) => {
+    let n, mantisse, exp;
+    if (d === 1) {
+      // Facile : nombres simples, exp positif petit
+      mantisse = (rand(10, 99) / 10).toFixed(1); // 1.0 à 9.9
+      exp = pick([2, 3, 4]);
+      n = parseFloat(mantisse) * Math.pow(10, exp);
+      // Affichage : nombre entier ou décimal simple
+    } else if (d === 2) {
+      // Moyen : exp positif ou négatif
+      mantisse = (rand(10, 99) / 10).toFixed(1);
+      exp = pick([-3, -2, 2, 3, 4, 5]);
+      n = parseFloat(mantisse) * Math.pow(10, exp);
+    } else {
+      // Difficile : grands ou très petits
+      mantisse = (rand(100, 999) / 100).toFixed(2);
+      exp = pick([-5, -4, -3, 5, 6, 7]);
+      n = parseFloat(mantisse) * Math.pow(10, exp);
+    }
+    // Affichage du nombre n sans notation scientifique
+    let nAff;
+    if (exp >= 0) {
+      nAff = n.toLocaleString('fr-FR', { maximumFractionDigits: 6, useGrouping: false });
+    } else {
+      nAff = n.toFixed(Math.abs(exp) + 2).replace(/0+$/, '').replace(/\.$/, '');
+    }
+    return {
+      enonce: `Écrire le nombre $${nAff}$ en notation scientifique.`,
+      corrige: `$${nAff} = ${mantisse} \\times 10^{${exp}}$.`
+    };
+  },
+
+  // Convertir une écriture scientifique en décimal
+  esc_de: (d) => {
+    let mantisse, exp;
+    if (d === 1) {
+      mantisse = (rand(10, 99) / 10).toFixed(1);
+      exp = pick([2, 3, 4]);
+    } else if (d === 2) {
+      mantisse = (rand(10, 99) / 10).toFixed(1);
+      exp = pick([-3, -2, 2, 3, 4]);
+    } else {
+      mantisse = (rand(100, 999) / 100).toFixed(2);
+      exp = pick([-5, -4, 5, 6]);
+    }
+    const n = parseFloat(mantisse) * Math.pow(10, exp);
+    let nAff;
+    if (exp >= 0) {
+      nAff = n.toLocaleString('fr-FR', { maximumFractionDigits: 6, useGrouping: false });
+    } else {
+      nAff = n.toFixed(Math.abs(exp) + 2).replace(/0+$/, '').replace(/\.$/, '');
+    }
+    return {
+      enonce: `Écrire $${mantisse} \\times 10^{${exp}}$ en notation décimale usuelle.`,
+      corrige: `$${mantisse} \\times 10^{${exp}} = ${nAff}$.`
+    };
+  },
+
+  // Ordre de grandeur
+  esc_ordre: (d) => {
+    // On veut un nombre dont l'ordre de grandeur (puissance de 10) est repérable
+    let mantisse, exp;
+    if (d === 1) {
+      mantisse = rand(2, 8);
+      exp = pick([2, 3]);
+    } else if (d === 2) {
+      mantisse = (rand(15, 85) / 10).toFixed(1);
+      exp = pick([-2, 2, 3, 4]);
+    } else {
+      mantisse = (rand(15, 85) / 10).toFixed(1);
+      exp = pick([-4, -3, 4, 5, 6]);
+    }
+    const mNum = parseFloat(mantisse);
+    // L'ordre de grandeur est 10^exp si mantisse < 5, sinon 10^(exp+1)
+    const ordre = mNum < 5 ? exp : exp + 1;
+    const n = mNum * Math.pow(10, exp);
+    let nAff;
+    if (exp >= 0) {
+      nAff = n.toLocaleString('fr-FR', { maximumFractionDigits: 6, useGrouping: false });
+    } else {
+      nAff = n.toFixed(Math.abs(exp) + 2).replace(/0+$/, '').replace(/\.$/, '');
+    }
+    return {
+      enonce: `Donner l'ordre de grandeur du nombre $${nAff}$.`,
+      corrige: `$${nAff} \\approx ${mNum < 5 ? '1' : '1'} \\times 10^{${ordre}}$, donc son ordre de grandeur est $10^{${ordre}}$.`
+    };
+  },
+
+  /* ===== LOT 5 — PROPORTIONNALITÉ (rappels) ===== */
+
+  // Pourcentages simples (10%, 25%, 50%)
+  pr_pct: (d) => {
+    let pct, n;
+    if (d === 1) {
+      pct = pick([10, 25, 50]);
+      // n choisi pour que le résultat tombe juste
+      if (pct === 10) n = 10 * rand(2, 20);
+      else if (pct === 25) n = 4 * rand(5, 25);
+      else n = 2 * rand(10, 50);
+    } else if (d === 2) {
+      pct = pick([10, 20, 25, 50, 75]);
+      if (pct === 10) n = 10 * rand(3, 30);
+      else if (pct === 20) n = 5 * rand(4, 30);
+      else if (pct === 25) n = 4 * rand(5, 30);
+      else if (pct === 50) n = 2 * rand(15, 80);
+      else n = 4 * rand(8, 40);
+    } else {
+      pct = pick([5, 15, 30, 40, 60, 80]);
+      n = 100 * rand(2, 15);  // pour que les calculs tombent juste
+    }
+    const r = pct * n / 100;
+    return {
+      enonce: `Calculer $${pct}\\,\\%$ de $${n}$.`,
+      corrige: `$${pct}\\,\\%$ de $${n}$, c'est $\\dfrac{${pct}}{100} \\times ${n} = ${r}$.`
+    };
+  },
+
+  // Échelles
+  pr_ech: (d) => {
+    if (d === 1) {
+      const ech = pick([100, 200, 500]);
+      const reelleCm = ech * rand(2, 8);
+      const surPlanCm = reelleCm / ech;
+      return {
+        enonce: `Une carte est à l'échelle $\\dfrac{1}{${ech}}$. Une distance réelle de $${reelleCm}$ cm représente combien sur le plan ?`,
+        corrige: `Distance sur plan $= \\dfrac{${reelleCm}}{${ech}} = ${surPlanCm}$ cm.`
+      };
+    } else if (d === 2) {
+      const ech = pick([100, 200, 500, 1000]);
+      const surPlanCm = rand(3, 12);
+      const reelleCm = surPlanCm * ech;
+      const reelleM = reelleCm / 100;
+      return {
+        enonce: `Sur un plan à l'échelle $\\dfrac{1}{${ech}}$, deux points sont distants de $${surPlanCm}$ cm. Quelle est la distance réelle en mètres ?`,
+        corrige: `Distance réelle $= ${surPlanCm} \\times ${ech} = ${reelleCm}$ cm $= ${reelleM}$ m.`
+      };
+    } else {
+      const ech = pick([50000, 100000, 250000]);
+      const surCarteCm = rand(2, 15);
+      const reelleCm = surCarteCm * ech;
+      const reelleKm = reelleCm / 100000;
+      return {
+        enonce: `Sur une carte à l'échelle $\\dfrac{1}{${ech.toLocaleString('fr-FR').replace(/\u202f/g, '\\,')}}$, deux villes sont distantes de $${surCarteCm}$ cm. Quelle est la distance réelle en km ?`,
+        corrige: `Distance réelle $= ${surCarteCm} \\times ${ech} = ${reelleCm}$ cm $= ${reelleKm}$ km.`
+      };
+    }
+  },
+
+  // Vitesse moyenne (d = v × t)
+  pr_vit: (d) => {
+    if (d === 1) {
+      // Trouver d connaissant v et t
+      const v = pick([20, 30, 40, 50, 60, 80]);
+      const t = rand(2, 5);
+      const di = v * t;
+      return {
+        enonce: `Une voiture roule à $${v}$ km/h pendant $${t}$ h. Quelle distance parcourt-elle ?`,
+        corrige: `$d = v \\times t = ${v} \\times ${t} = ${di}$ km.`
+      };
+    } else if (d === 2) {
+      // Trouver v connaissant d et t, ou trouver t connaissant d et v
+      const variantes = [
+        () => {
+          const v = pick([40, 50, 60, 80, 100]);
+          const t = rand(2, 6);
+          const di = v * t;
+          return {
+            enonce: `Une voiture parcourt $${di}$ km en $${t}$ h. Quelle est sa vitesse moyenne ?`,
+            corrige: `$v = \\dfrac{d}{t} = \\dfrac{${di}}{${t}} = ${v}$ km/h.`
+          };
+        },
+        () => {
+          const v = pick([40, 50, 60, 80, 100]);
+          const t = rand(2, 6);
+          const di = v * t;
+          return {
+            enonce: `Une voiture parcourt $${di}$ km à la vitesse moyenne de $${v}$ km/h. Combien de temps met-elle ?`,
+            corrige: `$t = \\dfrac{d}{v} = \\dfrac{${di}}{${v}} = ${t}$ h.`
+          };
+        }
+      ];
+      return pick(variantes)();
+    } else {
+      // Difficile : avec minutes/secondes
+      const variantes = [
+        () => {
+          const v = pick([60, 90, 120]);
+          const tMin = rand(15, 45);
+          const di = v * tMin / 60;
+          return {
+            enonce: `Un train roule à $${v}$ km/h pendant $${tMin}$ min. Quelle distance parcourt-il ?`,
+            corrige: `$${tMin}$ min $= \\dfrac{${tMin}}{60}$ h. $d = ${v} \\times \\dfrac{${tMin}}{60} = ${di}$ km.`
+          };
+        },
+        () => {
+          // Vitesse en m/s vers km/h
+          const vms = pick([5, 10, 15, 20, 25]);
+          const vkmh = vms * 3.6;
+          return {
+            enonce: `Une vitesse de $${vms}$ m/s vaut combien en km/h ?`,
+            corrige: `$1$ m/s $= 3{,}6$ km/h. Donc $${vms}$ m/s $= ${vms} \\times 3{,}6 = ${vkmh}$ km/h.`
+          };
+        }
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  /* ===== LOT 6 — LECTURE DE TABLEAUX ===== */
+
+  // Lecture dans un tableau
+  lt_tab: (d) => {
+    if (d === 1) {
+      // Tableau à 2 colonnes - chercher la valeur manquante
+      const total = rand(20, 50);
+      const cat = ['Bleu', 'Rouge', 'Vert', 'Jaune'];
+      const valeurs = [rand(3, 15), rand(3, 15), rand(3, 15)];
+      const s = valeurs.reduce((a,b)=>a+b, 0);
+      const dernier = total - s;
+      if (dernier < 1) return generateurs.lt_tab(d); // sécurité
+      const tab = `<table style="border-collapse: collapse; margin: 8px 0; font-family: 'Crimson Pro', serif;">
+        <tr><th style="border: 1px solid #1e3a5f; padding: 4px 10px; background: #f5efe4;">Couleur</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">${cat[0]}</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">${cat[1]}</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">${cat[2]}</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">${cat[3]}</th></tr>
+        <tr><th style="border: 1px solid #1e3a5f; padding: 4px 10px; background: #f5efe4;">Nombre</th>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${valeurs[0]}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${valeurs[1]}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${valeurs[2]}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">?</td></tr>
+      </table>`;
+      return {
+        enonce: `Le tableau suivant comptabilise les couleurs préférées de $${total}$ élèves. Combien d'élèves préfèrent le ${cat[3].toLowerCase()} ?<br>${tab}`,
+        corrige: `Total moins les autres : $${total} - ${valeurs[0]} - ${valeurs[1]} - ${valeurs[2]} = ${dernier}$ élèves préfèrent le ${cat[3].toLowerCase()}.`
+      };
+    } else if (d === 2) {
+      // Tableau avec un total à calculer
+      const v1 = rand(15, 50);
+      const v2 = rand(15, 50);
+      const v3 = rand(15, 50);
+      const v4 = rand(15, 50);
+      const tot = v1 + v2 + v3 + v4;
+      const tab = `<table style="border-collapse: collapse; margin: 8px 0; font-family: 'Crimson Pro', serif;">
+        <tr><th style="border: 1px solid #1e3a5f; padding: 4px 10px; background: #f5efe4;">Mois</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">Jan</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">Fév</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">Mar</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">Avr</th></tr>
+        <tr><th style="border: 1px solid #1e3a5f; padding: 4px 10px; background: #f5efe4;">Ventes</th>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v1}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v2}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v3}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v4}</td></tr>
+      </table>`;
+      return {
+        enonce: `Le tableau donne les ventes mensuelles d'un magasin. Quel est le total des ventes sur ces 4 mois ?<br>${tab}`,
+        corrige: `$${v1} + ${v2} + ${v3} + ${v4} = ${tot}$. Total : $${tot}$ ventes.`
+      };
+    } else {
+      // Difficile : pourcentage ou moyenne dans un tableau
+      const v1 = 10 * rand(2, 8);
+      const v2 = 10 * rand(2, 8);
+      const v3 = 10 * rand(2, 8);
+      const v4 = 10 * rand(2, 8);
+      const tot = v1 + v2 + v3 + v4;
+      const moy = tot / 4;
+      const tab = `<table style="border-collapse: collapse; margin: 8px 0; font-family: 'Crimson Pro', serif;">
+        <tr><th style="border: 1px solid #1e3a5f; padding: 4px 10px; background: #f5efe4;">Trimestre</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">T₁</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">T₂</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">T₃</th>
+            <th style="border: 1px solid #1e3a5f; padding: 4px 10px;">T₄</th></tr>
+        <tr><th style="border: 1px solid #1e3a5f; padding: 4px 10px; background: #f5efe4;">CA (k€)</th>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v1}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v2}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v3}</td>
+            <td style="border: 1px solid #1e3a5f; padding: 4px 10px; text-align: center;">${v4}</td></tr>
+      </table>`;
+      return {
+        enonce: `Voici les chiffres d'affaires trimestriels d'une entreprise. Calculer le chiffre d'affaires moyen par trimestre.<br>${tab}`,
+        corrige: `Total : $${v1} + ${v2} + ${v3} + ${v4} = ${tot}$ k€. Moyenne : $\\dfrac{${tot}}{4} = ${moy}$ k€.`
+      };
+    }
+  },
+
+  // Diagramme circulaire (lecture en valeurs, sans graphique)
+  lt_circ: (d) => {
+    if (d === 1) {
+      const total = pick([180, 360]);
+      const angle = pick([60, 90, 120, 180]);
+      const r = angle * total / 360;
+      return {
+        enonce: `Dans un diagramme circulaire représentant $${total}$ personnes, un secteur mesure $${angle}°$. Combien de personnes représente-t-il ?`,
+        corrige: `On utilise la proportionnalité : $\\dfrac{${angle}}{360} \\times ${total} = ${r}$ personnes.`
+      };
+    } else if (d === 2) {
+      const total = pick([360, 540, 720]);
+      const partie = pick([45, 60, 75, 100, 144]);
+      const r = partie * total / 360;
+      return {
+        enonce: `Dans un diagramme circulaire représentant $${total}$ élèves, le secteur « sport » mesure $${partie}°$. Combien d'élèves font du sport ?`,
+        corrige: `$\\dfrac{${partie}}{360} \\times ${total} = ${r}$ élèves font du sport.`
+      };
+    } else {
+      // Trouver l'angle à partir de la valeur
+      const total = pick([200, 250, 400, 500]);
+      const nb = pick([50, 75, 100, 125]);
+      while (nb > total) nb = pick([50, 75, 100, 125]); // sécurité
+      const angle = (nb / total) * 360;
+      return {
+        enonce: `Dans une enquête auprès de $${total}$ personnes, $${nb}$ personnes ont répondu « oui ». Quel angle (en degrés) leur correspondrait sur un diagramme circulaire ?`,
+        corrige: `$\\dfrac{${nb}}{${total}} \\times 360 = ${angle}°$.`
+      };
+    }
+  },
+
+  // Diagramme en barres (lecture en valeurs, sans graphique)
+  lt_bar: (d) => {
+    if (d === 1) {
+      // Lecture simple : une barre représente N unités
+      const echelle = pick([5, 10]);
+      const hauteur = rand(2, 8);
+      const v = echelle * hauteur;
+      return {
+        enonce: `Sur un diagramme en barres, chaque carreau vaut $${echelle}$ unités. Une barre mesure $${hauteur}$ carreaux. Combien d'unités représente-t-elle ?`,
+        corrige: `$${echelle} \\times ${hauteur} = ${v}$ unités.`
+      };
+    } else if (d === 2) {
+      // Trouver la hauteur connaissant l'unité et la valeur
+      const echelle = pick([5, 10, 20, 25]);
+      const hauteur = rand(2, 8);
+      const v = echelle * hauteur;
+      return {
+        enonce: `Sur un diagramme en barres, chaque carreau vaut $${echelle}$ unités. Combien de carreaux doit faire une barre pour représenter $${v}$ unités ?`,
+        corrige: `$\\dfrac{${v}}{${echelle}} = ${hauteur}$ carreaux.`
+      };
+    } else {
+      // Trouver l'unité connaissant hauteur et valeur (proportionnalité)
+      const echelle = pick([4, 5, 8, 10, 20]);
+      const h = rand(3, 8);
+      const v = echelle * h;
+      return {
+        enonce: `Sur un diagramme en barres, une barre de $${h}$ carreaux représente $${v}$ unités. Quelle est la valeur d'un carreau ?`,
+        corrige: `$\\dfrac{${v}}{${h}} = ${echelle}$ unités par carreau.`
+      };
+    }
+  },
+
+  /* ===== LOT 7 — GÉOMÉTRIE (rappels) ===== */
+
+  // Périmètres
+  gr_perim: (d) => {
+    if (d === 1) {
+      // Carré ou rectangle simple
+      const variantes = [
+        () => { const c = rand(2, 15); return { enonce: `Calculer le périmètre d'un carré de côté $${c}$ cm.`, corrige: `$P = 4 \\times c = 4 \\times ${c} = ${4*c}$ cm.` }; },
+        () => { const L = rand(3, 15); const l = rand(2, L-1); return { enonce: `Calculer le périmètre d'un rectangle de longueur $${L}$ cm et de largeur $${l}$ cm.`, corrige: `$P = 2 \\times (L + l) = 2 \\times (${L} + ${l}) = 2 \\times ${L+l} = ${2*(L+l)}$ cm.` }; }
+      ];
+      return pick(variantes)();
+    } else if (d === 2) {
+      const variantes = [
+        () => { const c = rand(2, 20); return { enonce: `Calculer le périmètre d'un triangle équilatéral de côté $${c}$ cm.`, corrige: `$P = 3 \\times c = 3 \\times ${c} = ${3*c}$ cm.` }; },
+        () => { const r = rand(2, 15); return { enonce: `Calculer le périmètre d'un cercle de rayon $${r}$ cm (donner la valeur exacte en fonction de $\\pi$).`, corrige: `$P = 2 \\pi r = 2 \\pi \\times ${r} = ${2*r}\\pi$ cm.` }; },
+        () => { const a = rand(3, 10); const b = rand(3, 10); const c = rand(3, 10); return { enonce: `Calculer le périmètre d'un triangle de côtés $${a}$ cm, $${b}$ cm et $${c}$ cm.`, corrige: `$P = ${a} + ${b} + ${c} = ${a+b+c}$ cm.` }; }
+      ];
+      return pick(variantes)();
+    } else {
+      const variantes = [
+        () => { const r = rand(3, 20); return { enonce: `Calculer le périmètre d'un cercle de diamètre $${2*r}$ cm. Donner la valeur arrondie au dixième (prendre $\\pi \\approx 3{,}14$).`, corrige: `$P = \\pi \\times d = 3{,}14 \\times ${2*r} \\approx ${(3.14*2*r).toFixed(1)}$ cm.` }; },
+        () => { const L = rand(5, 20); const l = rand(3, L-2); return { enonce: `Le périmètre d'un rectangle est $${2*(L+l)}$ cm. Sa longueur est $${L}$ cm. Quelle est sa largeur ?`, corrige: `$P = 2(L+l)$ donc $L+l = \\dfrac{${2*(L+l)}}{2} = ${L+l}$. Largeur $= ${L+l} - ${L} = ${l}$ cm.` }; }
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  // Aires de figures usuelles
+  gr_aire: (d) => {
+    if (d === 1) {
+      const variantes = [
+        () => { const c = rand(2, 15); return { enonce: `Calculer l'aire d'un carré de côté $${c}$ cm.`, corrige: `$A = c^2 = ${c}^2 = ${c*c}$ cm².` }; },
+        () => { const L = rand(3, 15); const l = rand(2, L-1); return { enonce: `Calculer l'aire d'un rectangle de longueur $${L}$ cm et largeur $${l}$ cm.`, corrige: `$A = L \\times l = ${L} \\times ${l} = ${L*l}$ cm².` }; }
+      ];
+      return pick(variantes)();
+    } else if (d === 2) {
+      const variantes = [
+        () => { const b = 2 * rand(2, 12); const h = rand(3, 15); return { enonce: `Calculer l'aire d'un triangle de base $${b}$ cm et de hauteur $${h}$ cm.`, corrige: `$A = \\dfrac{b \\times h}{2} = \\dfrac{${b} \\times ${h}}{2} = \\dfrac{${b*h}}{2} = ${b*h/2}$ cm².` }; },
+        () => { const r = rand(2, 12); return { enonce: `Calculer l'aire d'un disque de rayon $${r}$ cm (valeur exacte en fonction de $\\pi$).`, corrige: `$A = \\pi r^2 = \\pi \\times ${r}^2 = ${r*r}\\pi$ cm².` }; },
+        () => { const b = rand(3, 12); const B = rand(b+2, b+10); const h = rand(2, 8); return { enonce: `Calculer l'aire d'un trapèze de petite base $${b}$ cm, grande base $${B}$ cm et hauteur $${h}$ cm.`, corrige: `$A = \\dfrac{(B + b) \\times h}{2} = \\dfrac{(${B} + ${b}) \\times ${h}}{2} = \\dfrac{${(B+b)*h}}{2} = ${(B+b)*h/2}$ cm².` }; }
+      ];
+      return pick(variantes)();
+    } else {
+      const variantes = [
+        () => { const r = rand(3, 10); return { enonce: `Calculer l'aire d'un disque de diamètre $${2*r}$ cm. Donner la valeur arrondie au dixième (prendre $\\pi \\approx 3{,}14$).`, corrige: `Le rayon vaut $${r}$ cm. $A = \\pi r^2 = 3{,}14 \\times ${r*r} \\approx ${(3.14*r*r).toFixed(1)}$ cm².` }; },
+        () => { const L = rand(5, 20); const aire = L * rand(2, L-1); return { enonce: `Un rectangle a une aire de $${aire}$ cm² et une longueur de $${L}$ cm. Quelle est sa largeur ?`, corrige: `$l = \\dfrac{A}{L} = \\dfrac{${aire}}{${L}} = ${aire/L}$ cm.` }; }
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  // Volumes de solides usuels
+  gr_vol: (d) => {
+    if (d === 1) {
+      const variantes = [
+        () => { const c = rand(2, 8); return { enonce: `Calculer le volume d'un cube d'arête $${c}$ cm.`, corrige: `$V = c^3 = ${c}^3 = ${c*c*c}$ cm³.` }; },
+        () => { const L = rand(2, 10); const l = rand(2, 10); const h = rand(2, 10); return { enonce: `Calculer le volume d'un pavé droit de dimensions $${L}$ cm, $${l}$ cm et $${h}$ cm.`, corrige: `$V = L \\times l \\times h = ${L} \\times ${l} \\times ${h} = ${L*l*h}$ cm³.` }; }
+      ];
+      return pick(variantes)();
+    } else if (d === 2) {
+      const variantes = [
+        () => { const r = rand(2, 8); const h = rand(3, 12); return { enonce: `Calculer le volume d'un cylindre de rayon $${r}$ cm et hauteur $${h}$ cm (valeur exacte en fonction de $\\pi$).`, corrige: `$V = \\pi r^2 h = \\pi \\times ${r}^2 \\times ${h} = ${r*r*h}\\pi$ cm³.` }; },
+        () => { const c = rand(3, 10); return { enonce: `Un cube a une arête de $${c}$ dm. Quel est son volume en litres ?`, corrige: `$V = ${c}^3 = ${c*c*c}$ dm³ $= ${c*c*c}$ L.` }; }
+      ];
+      return pick(variantes)();
+    } else {
+      const variantes = [
+        () => { const r = rand(2, 8); return { enonce: `Calculer le volume d'une boule de rayon $${r}$ cm (valeur exacte en fonction de $\\pi$).`, corrige: `$V = \\dfrac{4}{3} \\pi r^3 = \\dfrac{4}{3} \\pi \\times ${r}^3 = \\dfrac{${4*r*r*r}\\pi}{3}$ cm³.` }; },
+        () => { const r = rand(2, 6); const h = rand(3, 10); return { enonce: `Calculer le volume d'un cône de rayon $${r}$ cm et hauteur $${h}$ cm (valeur exacte en fonction de $\\pi$).`, corrige: `$V = \\dfrac{1}{3} \\pi r^2 h = \\dfrac{\\pi \\times ${r}^2 \\times ${h}}{3} = \\dfrac{${r*r*h}\\pi}{3}$ cm³.` }; }
+      ];
+      return pick(variantes)();
+    }
+  },
+
+  // Pythagore (rappel)
+  gr_pyth: (d) => {
+    // Triplets pythagoriciens pour avoir des résultats entiers
+    const triplets = [[3,4,5], [5,12,13], [6,8,10], [8,15,17], [9,12,15], [9,40,41], [12,16,20], [7,24,25]];
+    if (d === 1) {
+      // Triplets simples, on demande l'hypoténuse
+      const [a, b, c] = pick([[3,4,5], [6,8,10], [5,12,13]]);
+      return {
+        enonce: `Le triangle $ABC$ est rectangle en $A$. On a $AB = ${a}$ cm et $AC = ${b}$ cm. Calculer $BC$.`,
+        corrige: `D'après Pythagore : $BC^2 = AB^2 + AC^2 = ${a}^2 + ${b}^2 = ${a*a} + ${b*b} = ${a*a + b*b}$. Donc $BC = \\sqrt{${a*a+b*b}} = ${c}$ cm.`
+      };
+    } else if (d === 2) {
+      // Mélange : hypoténuse ou côté
+      const [a, b, c] = pick(triplets);
+      const variantes = [
+        () => ({ enonce: `Le triangle $ABC$ est rectangle en $A$ avec $AB = ${a}$ cm et $AC = ${b}$ cm. Calculer $BC$.`,
+                 corrige: `$BC^2 = ${a}^2 + ${b}^2 = ${a*a + b*b}$. Donc $BC = ${c}$ cm.` }),
+        () => ({ enonce: `Le triangle $ABC$ est rectangle en $A$ avec $BC = ${c}$ cm et $AB = ${a}$ cm. Calculer $AC$.`,
+                 corrige: `$AC^2 = BC^2 - AB^2 = ${c}^2 - ${a}^2 = ${c*c} - ${a*a} = ${c*c - a*a}$. Donc $AC = ${b}$ cm.` })
+      ];
+      return pick(variantes)();
+    } else {
+      // Difficile : valeurs non triplets, résultat sous forme de racine
+      const a = rand(3, 8);
+      const b = rand(3, 8);
+      const c2 = a*a + b*b;
+      return {
+        enonce: `Le triangle $ABC$ est rectangle en $A$ avec $AB = ${a}$ cm et $AC = ${b}$ cm. Calculer la valeur exacte de $BC$.`,
+        corrige: `$BC^2 = ${a}^2 + ${b}^2 = ${a*a} + ${b*b} = ${c2}$. Donc $BC = \\sqrt{${c2}}$ cm.`
+      };
+    }
+  },
+
+  // Thalès (rappel)
+  gr_thales: (d) => {
+    if (d === 1) {
+      // Configuration simple, valeurs entières
+      const k = rand(2, 4);
+      const ae = rand(2, 6);
+      const ce = rand(3, 8);
+      const be = ae * k;
+      const de = ce * k;
+      return {
+        enonce: `Les droites $(AB)$ et $(CD)$ sont parallèles. On a $AE = ${ae}$, $BE = ${be}$ et $CE = ${ce}$. Calculer $DE$.`,
+        corrige: `D'après Thalès : $\\dfrac{AE}{BE} = \\dfrac{CE}{DE}$. Donc $DE = \\dfrac{BE \\times CE}{AE} = \\dfrac{${be} \\times ${ce}}{${ae}} = ${de}$.`
+      };
+    } else if (d === 2) {
+      const ae = rand(2, 6);
+      const be = rand(ae+1, ae+8);
+      const ce = rand(2, 7);
+      const de = parseFloat((be * ce / ae).toFixed(2));
+      return {
+        enonce: `Les droites $(AB)$ et $(CD)$ sont parallèles. On a $AE = ${ae}$ cm, $BE = ${be}$ cm et $CE = ${ce}$ cm. Calculer $DE$.`,
+        corrige: `$\\dfrac{AE}{BE} = \\dfrac{CE}{DE}$, donc $DE = \\dfrac{${be} \\times ${ce}}{${ae}} = ${de}$ cm.`
+      };
+    } else {
+      const ae = rand(2, 5);
+      const ke = rand(2, 4) + rand(1,9)/10;
+      const be = parseFloat((ae * ke).toFixed(1));
+      const ce = rand(3, 8);
+      const de = parseFloat((be * ce / ae).toFixed(2));
+      return {
+        enonce: `Les droites $(AB)$ et $(CD)$ sont parallèles. On a $AE = ${ae}$ cm, $BE = ${be}$ cm et $CE = ${ce}$ cm. Calculer $DE$ (arrondi au centième).`,
+        corrige: `$\\dfrac{AE}{BE} = \\dfrac{CE}{DE}$. $DE = \\dfrac{${be} \\times ${ce}}{${ae}} = ${de}$ cm.`
+      };
+    }
+  }
+};
+
+function aDesEnfantsActifs(noeud) {
+  if (!noeud.enfants) return noeud.actif;
+  return noeud.enfants.some(aDesEnfantsActifs);
+}
+
+function construireArbre() {
+  const racine = document.getElementById('arbre');
+  racine.innerHTML = '';
+  for (const theme of ARBRE) racine.appendChild(rendreNoeud(theme, 1));
+}
+
+function rendreNoeud(noeud, niveau) {
+  const div = document.createElement('div');
+  div.className = `noeud niveau-${niveau}`;
+  div.dataset.id = noeud.id;
+  const estFeuille = !noeud.enfants;
+  const actif = aDesEnfantsActifs(noeud);
+  const ligne = document.createElement('div');
+  ligne.className = 'ligne';
+  const triangle = document.createElement('span');
+  triangle.className = 'triangle';
+  if (estFeuille) { triangle.classList.add('vide'); triangle.textContent = ''; }
+  else { triangle.textContent = '▶'; triangle.addEventListener('click', () => basculerOuvert(div, triangle)); }
+  ligne.appendChild(triangle);
+
+  const case_ = document.createElement('input');
+  case_.type = 'checkbox';
+  case_.className = 'case';
+  case_.id = `case-${noeud.id}`;
+  case_.dataset.id = noeud.id;
+  case_.disabled = !actif;
+  case_.addEventListener('change', () => cocherChange(noeud));
+  ligne.appendChild(case_);
+
+  const libelle = document.createElement('label');
+  libelle.className = 'libelle';
+  libelle.htmlFor = case_.id;
+  libelle.textContent = noeud.titre;
+  if (!actif) {
+    libelle.classList.add('bientot');
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = 'bientôt';
+    libelle.appendChild(badge);
+  }
+  ligne.appendChild(libelle);
+
+  if (actif) {
+    const compteur = document.createElement('span');
+    compteur.className = 'compteur';
+    compteur.innerHTML = `<button type="button" data-action="moins">−</button><span class="valeur zero" data-valeur>0</span><button type="button" data-action="plus">+</button>`;
+    compteur.querySelector('[data-action="moins"]').addEventListener('click', () => modifierCompteur(noeud, -1));
+    compteur.querySelector('[data-action="plus"]').addEventListener('click', () => modifierCompteur(noeud, +1));
+    ligne.appendChild(compteur);
+  }
+  div.appendChild(ligne);
+
+  if (!estFeuille) {
+    const enfants = document.createElement('div');
+    enfants.className = 'enfants';
+    enfants.style.display = 'none';
+    for (const e of noeud.enfants) enfants.appendChild(rendreNoeud(e, niveau + 1));
+    div.appendChild(enfants);
+  }
+  return div;
+}
+
+function basculerOuvert(div, triangle) {
+  const enfants = div.querySelector('.enfants');
+  if (!enfants) return;
+  const ouvert = enfants.style.display !== 'none';
+  enfants.style.display = ouvert ? 'none' : 'block';
+  triangle.classList.toggle('ouvert', !ouvert);
+}
+
+function modifierCompteur(noeud, delta) {
+  if (estDescendantDeCoche(noeud)) return;
+  if (!aDesEnfantsActifs(noeud)) return;
+  const courant = etat[noeud.id] || 0;
+  const nv = Math.max(0, courant + delta);
+  etat[noeud.id] = nv;
+  const div = document.querySelector(`.noeud[data-id="${noeud.id}"]`);
+  const valeur = div.querySelector(':scope > .ligne .valeur');
+  if (valeur) { valeur.textContent = nv; valeur.classList.toggle('zero', nv === 0); }
+  const case_ = div.querySelector(':scope > .ligne .case');
+  if (case_) {
+    case_.checked = nv > 0;
+    if (nv > 0 && noeud.enfants) verrouillerDescendants(noeud, true);
+    if (nv === 0 && noeud.enfants) verrouillerDescendants(noeud, false);
+  }
+  majTotal();
+}
+
+function cocherChange(noeud) {
+  const div = document.querySelector(`.noeud[data-id="${noeud.id}"]`);
+  const case_ = div.querySelector(':scope > .ligne .case');
+  if (case_.checked) {
+    if (!(etat[noeud.id] > 0)) {
+      etat[noeud.id] = 1;
+      const valeur = div.querySelector(':scope > .ligne .valeur');
+      if (valeur) { valeur.textContent = 1; valeur.classList.remove('zero'); }
+    }
+    if (noeud.enfants) verrouillerDescendants(noeud, true);
+  } else {
+    etat[noeud.id] = 0;
+    const valeur = div.querySelector(':scope > .ligne .valeur');
+    if (valeur) { valeur.textContent = 0; valeur.classList.add('zero'); }
+    if (noeud.enfants) verrouillerDescendants(noeud, false);
+  }
+  majTotal();
+}
+
+function verrouillerDescendants(noeud, verrou) {
+  if (!noeud.enfants) return;
+  for (const e of noeud.enfants) {
+    const divE = document.querySelector(`.noeud[data-id="${e.id}"]`);
+    if (!divE) continue;
+    const caseE = divE.querySelector(':scope > .ligne .case');
+    const libE = divE.querySelector(':scope > .ligne .libelle');
+    if (caseE) {
+      if (verrou) {
+        caseE.disabled = true;
+        if (libE) libE.classList.add('parent-coche');
+        if (caseE.checked) {
+          caseE.checked = false;
+          etat[e.id] = 0;
+          const v = divE.querySelector(':scope > .ligne .valeur');
+          if (v) { v.textContent = 0; v.classList.add('zero'); }
+        }
+      } else {
+        if (aDesEnfantsActifs(e)) caseE.disabled = false;
+        if (libE) libE.classList.remove('parent-coche');
+      }
+    }
+    verrouillerDescendants(e, verrou);
+  }
+}
+
+function estDescendantDeCoche(noeud) {
+  function chercher(arbre, idCible, chemin) {
+    for (const n of arbre) {
+      const nc = [...chemin, n];
+      if (n.id === idCible) return nc;
+      if (n.enfants) { const r = chercher(n.enfants, idCible, nc); if (r) return r; }
+    }
+    return null;
+  }
+  const chemin = chercher(ARBRE, noeud.id, []);
+  if (!chemin) return false;
+  for (let i = 0; i < chemin.length - 1; i++) {
+    if ((etat[chemin[i].id] || 0) > 0) return true;
+  }
+  return false;
+}
+
+function majTotal() {
+  let total = 0;
+  function visiter(noeud, parentCoche) {
+    const c = etat[noeud.id] || 0;
+    if (c > 0 && !parentCoche) total += c;
+    if (noeud.enfants) {
+      const monStatut = parentCoche || (c > 0);
+      for (const e of noeud.enfants) visiter(e, monStatut);
+    }
+  }
+  for (const t of ARBRE) visiter(t, false);
+  document.getElementById('total-questions').textContent = total;
+  document.getElementById('total-s').textContent = total > 1 ? 's' : '';
+}
+
+function recolterFeuillesActives(noeud) {
+  if (!noeud.enfants) return noeud.actif ? [noeud.id] : [];
+  const r = [];
+  for (const e of noeud.enfants) r.push(...recolterFeuillesActives(e));
+  return r;
+}
+
+function collecterGenerateurs() {
+  const blocs = [];
+  function visiter(noeud, parentCoche) {
+    const c = etat[noeud.id] || 0;
+    if (c > 0 && !parentCoche) {
+      const gens = recolterFeuillesActives(noeud);
+      if (gens.length > 0) blocs.push({ generateurs: gens, nombre: c });
+    }
+    if (noeud.enfants) {
+      const monStatut = parentCoche || (c > 0);
+      for (const e of noeud.enfants) visiter(e, monStatut);
+    }
+  }
+  for (const t of ARBRE) visiter(t, false);
+  return blocs;
+}
+
+function genererListeExercices(blocs, difficulte) {
+  const exercices = [];
+  for (const b of blocs) {
+    const tirages = [];
+    if (b.nombre <= b.generateurs.length) {
+      const pool = b.generateurs.slice();
+      while (tirages.length < b.nombre) {
+        const idx = Math.floor(Math.random() * pool.length);
+        tirages.push(pool[idx]);
+        pool.splice(idx, 1);
+      }
+    } else {
+      while (tirages.length < b.nombre) {
+        const restant = b.generateurs.slice();
+        while (restant.length > 0 && tirages.length < b.nombre) {
+          const idx = Math.floor(Math.random() * restant.length);
+          tirages.push(restant[idx]);
+          restant.splice(idx, 1);
+        }
+      }
+    }
+    for (const id of tirages) {
+      const g = generateurs[id];
+      if (g) exercices.push(g(difficulte));
+    }
+  }
+  for (let i = exercices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [exercices[i], exercices[j]] = [exercices[j], exercices[i]];
+  }
+  return exercices;
+}
+
+// Liste des thèmes cochés au plus haut niveau (pour le sous-titre PDF)
+function thèmesChoisis() {
+  const noms = [];
+  function visiter(noeud, parentCoche) {
+    const c = etat[noeud.id] || 0;
+    if (c > 0 && !parentCoche) noms.push(noeud.titre);
+    if (noeud.enfants) {
+      const monStatut = parentCoche || (c > 0);
+      for (const e of noeud.enfants) visiter(e, monStatut);
+    }
+  }
+  for (const t of ARBRE) visiter(t, false);
+  return noms;
+}
+
+// HTML pour la page 1 : énoncés
+function composerHTMLEnonces(exercices, difficulte) {
+  const dateFr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const etoiles = '★'.repeat(difficulte);
+  const themes = thèmesChoisis().join(' · ');
+  const sousTitre = themes
+    ? `${themes}<br><span style="font-size: 12px;">Fiche générée le ${dateFr} — Difficulté : ${etoiles}</span>`
+    : `Fiche générée le ${dateFr} — Difficulté : ${etoiles}`;
+  let html = `<div class="entete-pdf"><h2>Automatismes — Seconde</h2><div class="sous">${sousTitre}</div></div>`;
+  exercices.forEach((ex, i) => {
+    html += `<div class="exercice"><span class="num">${i+1}.</span><span class="enonce">${ex.enonce}</span><div class="reponse-cadre"></div></div>`;
+  });
+  html += `<div class="pied-pdf">LaboMath — Lycée de Baudre · Agen</div>`;
+  return html;
+}
+
+// HTML pour la page 2 : corrigés
+function composerHTMLCorriges(exercices, difficulte) {
+  const dateFr = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const etoiles = '★'.repeat(difficulte);
+  let html = `<div class="entete-pdf"><h2>Corrigés — Automatismes Seconde</h2><div class="sous">${dateFr} — Difficulté : ${etoiles}</div></div>`;
+  exercices.forEach((ex, i) => {
+    html += `<div class="corrige"><span class="num">${i+1}.</span> <span class="texte">${ex.corrige}</span></div>`;
+  });
+  html += `<div class="pied-pdf">LaboMath — Lycée de Baudre · Agen</div>`;
+  return html;
+}
+
+// Capturer une zone HTML en image base64, en utilisant la zone PDF cachée
+// Retourne aussi les positions verticales des "blocs cassables" (exercices/corrigés)
+async function capturerHTMLversCanvas(html) {
+  const zone = document.getElementById('zone-pdf');
+  zone.innerHTML = html;
+  renderMathInElement(zone, {
+    delimiters: [{ left: '$', right: '$', display: false }, { left: '$$', right: '$$', display: true }],
+    throwOnError: false
+  });
+  await new Promise(r => setTimeout(r, 250));
+  const apercu = document.getElementById('apercu-pdf');
+  apercu.style.display = 'block';
+  apercu.style.position = 'absolute';
+  apercu.style.left = '-9999px';
+
+  // AVANT la capture : repérer les bordures des blocs (exercices ou corrigés)
+  // pour pouvoir découper proprement le PDF
+  const zoneTop = zone.getBoundingClientRect().top;
+  const blocs = zone.querySelectorAll('.exercice, .corrige');
+  const limites = []; // positions verticales (en pixels HTML) des fins de bloc
+  for (const b of blocs) {
+    const r = b.getBoundingClientRect();
+    limites.push(r.bottom - zoneTop);
+  }
+  const canvas = await html2canvas(zone, { scale: 2, backgroundColor: '#ffffff' });
+  apercu.style.display = 'none';
+  // Convertir les limites HTML en limites de pixels canvas (scale 2)
+  const limitesCanvas = limites.map(l => l * 2);
+  return { canvas, limitesCanvas };
+}
+
+// Ajouter un canvas au PDF en respectant les frontières entre exercices
+// (jamais couper au milieu d'un exercice)
+function ajouterCanvasAuPDF(pdf, capture, debut) {
+  const pageW_mm = 210, pageH_mm = 297;
+  const margeBas_mm = 4; // marge de sécurité en bas de page
+  const canvas = capture.canvas;
+  const limitesCanvas = capture.limitesCanvas || [];
+
+  // Conversion : 1 mm de page = (canvas.width / pageW_mm) px de canvas
+  const pxParMm = canvas.width / pageW_mm;
+  const pageH_px = pageH_mm * pxParMm;
+  const margeBas_px = margeBas_mm * pxParMm;
+
+  if (!debut) pdf.addPage();
+
+  let debutPagePx = 0; // position du haut de la page courante dans le canvas
+  while (debutPagePx < canvas.height) {
+    // Position théorique de fin de page (avant les marges)
+    const finTheorique = debutPagePx + pageH_px - margeBas_px;
+    let finPage;
+
+    if (finTheorique >= canvas.height) {
+      // Dernière page, on prend tout le reste
+      finPage = canvas.height;
+    } else {
+      // Chercher la dernière limite (fin d'exercice) qui se trouve avant finTheorique
+      // et au-dessus de debutPagePx + une hauteur minimale (pour ne pas faire de pages quasi vides)
+      const hauteurMinPage = pageH_px * 0.3;
+      let meilleureLimite = finTheorique;
+      for (const l of limitesCanvas) {
+        if (l > debutPagePx + hauteurMinPage && l <= finTheorique) {
+          meilleureLimite = l;
+        }
+      }
+      finPage = meilleureLimite;
+    }
+
+    // Créer un canvas temporaire avec la portion utile
+    const canvasTemp = document.createElement('canvas');
+    canvasTemp.width = canvas.width;
+    canvasTemp.height = finPage - debutPagePx;
+    const ctx = canvasTemp.getContext('2d');
+    // Fond blanc
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+    // Copier la portion utile
+    ctx.drawImage(canvas, 0, debutPagePx, canvas.width, finPage - debutPagePx,
+                          0, 0, canvas.width, finPage - debutPagePx);
+    // Calculer la hauteur correspondante en mm
+    const hauteurPortion_mm = (finPage - debutPagePx) / pxParMm;
+    const imgData = canvasTemp.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, pageW_mm, hauteurPortion_mm);
+
+    debutPagePx = finPage;
+    if (debutPagePx < canvas.height) pdf.addPage();
+  }
+}
+
+async function genererPDF() {
+  const bouton = document.getElementById('bouton-generer');
+  const message = document.getElementById('message');
+  message.style.display = 'none';
+  const blocs = collecterGenerateurs();
+  if (blocs.length === 0) {
+    message.textContent = "Sélectionne au moins un thème avec au moins une question.";
+    message.className = 'message erreur'; message.style.display = 'block';
+    return;
+  }
+  const difficulte = parseInt(document.querySelector('input[name="difficulte"]:checked').value);
+  const avecCorriges = document.getElementById('corriges').checked;
+  bouton.disabled = true; bouton.textContent = "Génération…";
+  try {
+    const exercices = genererListeExercices(blocs, difficulte);
+
+    // Page 1 : énoncés
+    const canvasEnonces = await capturerHTMLversCanvas(composerHTMLEnonces(exercices, difficulte));
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+    ajouterCanvasAuPDF(pdf, canvasEnonces, true);
+
+    // Page 2 : corrigés (sur nouvelle page)
+    if (avecCorriges) {
+      const canvasCorriges = await capturerHTMLversCanvas(composerHTMLCorriges(exercices, difficulte));
+      ajouterCanvasAuPDF(pdf, canvasCorriges, false);
+    }
+
+    const dateIso = new Date().toISOString().slice(0, 10);
+    pdf.save(`automatismes_labomath_${dateIso}.pdf`);
+    message.textContent = `PDF généré (${exercices.length} questions, difficulté ${'★'.repeat(difficulte)}).`;
+    message.className = 'message succes'; message.style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    message.textContent = "Erreur : " + err.message;
+    message.className = 'message erreur'; message.style.display = 'block';
+  } finally {
+    bouton.disabled = false; bouton.textContent = "Générer mon PDF";
+  }
+}
+
+document.getElementById('btn-tout-deplier').addEventListener('click', () => {
+  document.querySelectorAll('.enfants').forEach(e => e.style.display = 'block');
+  document.querySelectorAll('.triangle:not(.vide)').forEach(t => t.classList.add('ouvert'));
+});
+document.getElementById('btn-tout-replier').addEventListener('click', () => {
+  document.querySelectorAll('.enfants').forEach(e => e.style.display = 'none');
+  document.querySelectorAll('.triangle:not(.vide)').forEach(t => t.classList.remove('ouvert'));
+});
+document.getElementById('btn-tout-decocher').addEventListener('click', () => {
+  for (const k of Object.keys(etat)) etat[k] = 0;
+  document.querySelectorAll('.case').forEach(c => c.checked = false);
+  document.querySelectorAll('.valeur').forEach(v => { v.textContent = '0'; v.classList.add('zero'); });
+  document.querySelectorAll('.noeud').forEach(n => {
+    const id = n.dataset.id;
+    const findN = (arbre) => { for (const x of arbre) { if (x.id === id) return x; if (x.enfants) { const r = findN(x.enfants); if (r) return r; } } return null; };
+    const noeud = findN(ARBRE);
+    if (!noeud) return;
+    const c = n.querySelector(':scope > .ligne .case');
+    if (c && aDesEnfantsActifs(noeud)) c.disabled = false;
+    const lib = n.querySelector(':scope > .ligne .libelle');
+    if (lib) lib.classList.remove('parent-coche');
+  });
+  majTotal();
+});
+
+document.querySelectorAll('input[name="difficulte"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('etoiles-affichees').textContent = '★'.repeat(parseInt(r.value));
+  });
+});
+
+document.getElementById('bouton-generer').addEventListener('click', genererPDF);
+
+construireArbre();
+majTotal();
+</script>
+</body>
+</html>
