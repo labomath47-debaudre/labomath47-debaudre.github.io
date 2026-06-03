@@ -476,7 +476,7 @@ const ARBRE = [
   // Questions de révision plus consistantes que les automatismes (1 à 3 sous-questions),
   // accompagnées d'un rappel de cours optionnel groupé en tête de fiche.
   { id: 'revisions', titre: 'RÉVISIONS — Contrôles & Bac', profils: ['terminale_spe'], enfants: [
-    { id: '', titre: 'Annales — questions rapides (type bac)', enfants: [
+   { id: 'rev_annales', titre: 'Annales — questions rapides (type bac)', enfants: [
       { id: '_qcm', titre: 'QCM (4 propositions)', enfants: [
         { id: '_qcm_primitive_xex', titre: 'Primitive de $x\\,e^{x}$', actif: true },
         { id: '_qcm_limite_geom', titre: 'Limite d\'un quotient de puissances', actif: true },
