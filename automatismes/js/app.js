@@ -519,7 +519,7 @@ const ARBRE = [
         { id: 'rev_bac_suites_seuil_python', titre: 'Algorithme de seuil (Python)', actif: true },
         { id: 'rev_bac_suites_recurrente_f', titre: 'Suite récurrente $u_{n+1} = f(u_n)$ : étude complète', actif: true }
       ]},
-      { id: 'rev_annales_espace', titre: 'Géométrie dans l\'espace (type bac)', enfants: [
+     { id: 'rev_annales_espace', titre: 'Géométrie dans l\'espace (type bac)', enfants: [
         { id: 'rev_annales_esp_normal_plan', titre: 'Vecteur normal à un plan', actif: true },
         { id: 'rev_annales_esp_distance', titre: 'Distance d\'un point à un plan', actif: true },
         { id: 'rev_annales_esp_volume', titre: 'Volume d\'un tétraèdre $OABC$', actif: true },
@@ -529,6 +529,15 @@ const ARBRE = [
         { id: 'rev_annales_esp_projete', titre: 'Projeté orthogonal sur un plan', actif: true },
         { id: 'rev_annales_esp_pos_droites', titre: 'Position relative de deux droites', actif: true },
         { id: 'rev_annales_esp_sphere', titre: 'Sphère (appartenance d\'un point)', actif: true }
+      ]},
+      { id: 'rev_annales_geo_bac', titre: 'Géométrie dans l\'espace — exercices type bac', enfants: [
+        { id: 'rev_bac_geo_etude_tetra', titre: 'Étude complète d\'un tétraèdre $OABC$', actif: true },
+        { id: 'rev_bac_geo_plan_3pts', titre: 'Équation cartésienne d\'un plan par 3 points', actif: true },
+        { id: 'rev_bac_geo_intersection_dp', titre: 'Intersection droite-plan (résolution système)', actif: true },
+        { id: 'rev_bac_geo_distance_projete', titre: 'Distance + projeté orthogonal sur un plan', actif: true },
+        { id: 'rev_bac_geo_sphere', titre: 'Sphère : équation, intersection droite/plan', actif: true },
+        { id: 'rev_bac_geo_position_relative', titre: 'Position relative de deux droites', actif: true },
+        { id: 'rev_bac_geo_perpendicularite', titre: 'Droite et plan perpendiculaires', actif: true }
       ]},
       { id: 'rev_annales_python', titre: 'Lecture de script Python', enfants: [
         { id: 'rev_annales_py_seuil', titre: 'Recherche de seuil (suite géométrique)', actif: true },
