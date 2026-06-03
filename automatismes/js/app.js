@@ -542,11 +542,20 @@ const ARBRE = [
         { id: 'rev_annales_lec_variation_fprime', titre: 'Variations de $f$ à partir de $f\'$', actif: true },
         { id: 'rev_annales_lec_signe_fss', titre: 'Signe de $f\'\'$ par lecture', actif: true }
       ]},
-      { id: 'rev_annales_proba', titre: 'Probabilités (type bac)', enfants: [
+     { id: 'rev_annales_proba', titre: 'Probabilités (type bac)', enfants: [
         { id: 'rev_annales_proba_arbre_cond', titre: 'Probabilité conditionnelle par arbre', actif: true },
         { id: 'rev_annales_proba_totales', titre: 'Formule des probabilités totales', actif: true },
         { id: 'rev_annales_proba_binom_calc', titre: '$P(X \\geqslant k)$ à la calculatrice', actif: true },
         { id: 'rev_annales_proba_esp_va', titre: 'Espérance d\'une variable aléatoire', actif: true }
+      ]},
+      { id: 'rev_annales_proba_bac', titre: 'Probabilités — exercices type bac', enfants: [
+        { id: 'rev_bac_proba_arbre_total', titre: 'Arbre pondéré + probas totales + conditionnelle inverse', actif: true },
+        { id: 'rev_bac_proba_binom_etude', titre: 'Loi binomiale en contexte (étude complète)', actif: true },
+        { id: 'rev_bac_proba_binom_seuil', titre: 'Seuil binomial : trouver $n$ minimum', actif: true },
+        { id: 'rev_bac_proba_va_jeu', titre: 'Variable aléatoire de gain dans un jeu', actif: true },
+        { id: 'rev_bac_proba_succession', titre: 'Succession d\'épreuves indépendantes', actif: true },
+        { id: 'rev_bac_proba_concentration_appli', titre: 'Bienaymé-Tchebychev en application', actif: true },
+        { id: 'rev_bac_proba_independance', titre: 'Tester l\'indépendance', actif: true }
       ]},
       { id: 'rev_annales_conc', titre: 'Concentration & loi des grands nombres', enfants: [
         { id: 'rev_annales_conc_tcheb', titre: 'Bienaymé-Tchebychev (sur $X$)', actif: true },
