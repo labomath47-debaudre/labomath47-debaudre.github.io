@@ -510,6 +510,15 @@ const ARBRE = [
         { id: 'rev_annales_recur_encadrement', titre: 'Encadrement $m \\leqslant u_n \\leqslant M$', actif: true },
         { id: 'rev_annales_recur_monotonie', titre: 'Monotonie $u_{n+1} > u_n$', actif: true }
       ]},
+      { id: 'rev_annales_suites_bac', titre: 'Suites — résolution complète (type bac)', enfants: [
+        { id: 'rev_bac_suites_recurrence_simple', titre: 'Récurrence : démonstration simple', actif: true },
+        { id: 'rev_bac_suites_recurrence_etude', titre: 'Récurrence + étude (monotonie, bornes)', actif: true },
+        { id: 'rev_bac_suites_arith_geom_aux', titre: 'Suite auxiliaire géométrique ($v_n = u_n - L$)', actif: true },
+        { id: 'rev_bac_suites_limite_qn', titre: 'Limite avec $q^n$', actif: true },
+        { id: 'rev_bac_suites_somme', titre: 'Somme géométrique / arith-géom', actif: true },
+        { id: 'rev_bac_suites_seuil_python', titre: 'Algorithme de seuil (Python)', actif: true },
+        { id: 'rev_bac_suites_recurrente_f', titre: 'Suite récurrente $u_{n+1} = f(u_n)$ : étude complète', actif: true }
+      ]},
       { id: 'rev_annales_espace', titre: 'Géométrie dans l\'espace (type bac)', enfants: [
         { id: 'rev_annales_esp_normal_plan', titre: 'Vecteur normal à un plan', actif: true },
         { id: 'rev_annales_esp_distance', titre: 'Distance d\'un point à un plan', actif: true },
