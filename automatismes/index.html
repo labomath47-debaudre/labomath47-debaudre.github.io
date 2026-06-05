@@ -369,6 +369,11 @@
     #zone-pdf .corrige .texte { color: #4a443c; }
     /* MathJax : assurer un rendu propre des SVG */
     #zone-pdf mjx-container { font-size: 1.05em; }
+    /* Masquer les éléments d'accessibilité MathML que html2canvas capture par erreur
+       (ils sont normalement invisibles à l'écran via un clip CSS que html2canvas ignore).
+       Sans ce masquage, chaque formule apparaît en double dans le PDF, l'une en SVG
+       propre, l'autre en MathML brut superposé. */
+    #zone-pdf mjx-assistive-mml { display: none !important; }
     /* Tableaux croisés (stats) — affichés en bloc, après l'énoncé */
     #zone-pdf .tableau-zone {
       margin: 8px 0;
