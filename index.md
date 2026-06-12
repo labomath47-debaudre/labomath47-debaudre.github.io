@@ -3,11 +3,11 @@ layout: default
 title: Accueil
 ---
 <h1>Bienvenue au LaboMath</h1>
-<p>Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Seconde au BTS, en passant par la consolidation pour les bacheliers professionnels, chacun y trouvera fiches, cahiers et supports en accès libre.</p>
+<p>Un espace dédié aux ressources mathématiques du Lycée de Baudre. De la Seconde au BTS, en passant par la consolidation pour les bacheliers s'orientant vers les BTS industriels, chacun y trouvera fiches, cahiers et supports en accès libre.</p>
 <div class="separateur">∞</div>
 <div class="actualite">
   <p class="actualite-titre">∂ Actualité</p>
-  <p>Le LaboMath ouvre ses portes. Le site est en ligne. Générateurs d'automatismes et révisions bac disponibles.</p>
+  <p>Le LaboMath ouvre ses portes. Générateurs d'automatismes et révisions bac disponibles. Livrets de consolidation pour futurs BTS en ligne</p>
 </div>
 <h2>Explorer par niveau</h2>
 <p class="sous-titre">Cinq portes d'entrée selon votre classe ou votre formation.</p>
