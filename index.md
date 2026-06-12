@@ -7,7 +7,7 @@ title: Accueil
 <div class="separateur">∞</div>
 <div class="actualite">
   <p class="actualite-titre">∂ Actualité</p>
-  <p>Le LaboMath ouvre ses portes. Les premières ressources arrivent prochainement.</p>
+  <p>Le LaboMath ouvre ses portes. Le site est en ligne. Générateurs d'automatismes et révisions bac disponibles.</p>
 </div>
 <h2>Explorer par niveau</h2>
 <p class="sous-titre">Cinq portes d'entrée selon votre classe ou votre formation.</p>
