@@ -9,7 +9,7 @@ title: BTS CPRP — Passerelle
 
 # BTS Conception des Processus de Réalisation de Produits
 
-<div class="specialite-intro">
+<div class="specialite-intro specialite-intro--triple">
 
   <div>
     <h2>Le BTS CPRP au Lycée de Baudre</h2>
@@ -18,8 +18,8 @@ title: BTS CPRP — Passerelle
   </div>
 
   <div>
-    <p class="cahier-titre">Cahier complet</p>
-    <a href="{{ '/passerelle/docs/complets/parcours-cprp-complet.pdf' | relative_url }}" class="cahier-complet">
+    <p class="cahier-titre">Parcours — Cahier complet</p>
+    <a href="{{ '/passerelle/docs/complets/parcours-cprp-complet-etudiant.pdf' | relative_url }}" class="cahier-complet">
       <span class="symbole">⛛</span>
       <div>
         <span class="titre">Parcours CPRP complet</span>
@@ -27,29 +27,68 @@ title: BTS CPRP — Passerelle
       </div>
     </a>
 
-    <p class="cahier-titre">Cahier par semaine</p>
+    <p class="cahier-titre">Parcours — Cahier par semaine</p>
     <div class="semaines">
-      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s1.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s1-etudiant.pdf' | relative_url }}">
         <span class="num">1</span>
         <span class="theme">Calcul, formules et unités</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s2.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s2-etudiant.pdf' | relative_url }}">
         <span class="num">2</span>
         <span class="theme">Proportionnalité et géométrie de base</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s3.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s3-etudiant.pdf' | relative_url }}">
         <span class="num">3</span>
         <span class="theme">Trigonométrie</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s4.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s4-etudiant.pdf' | relative_url }}">
         <span class="num">4</span>
         <span class="theme">Vecteurs</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s5.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s5-etudiant.pdf' | relative_url }}">
         <span class="num">5</span>
         <span class="theme">Fonctions et lecture graphique</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s6.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-cprp-s6-etudiant.pdf' | relative_url }}">
+        <span class="num">6</span>
+        <span class="theme">Dérivation</span>
+      </a>
+    </div>
+  </div>
+
+  <div>
+    <p class="cahier-titre">Approfondissement — Cahier complet</p>
+    <a href="{{ '/passerelle/docs/complets/approfondissement-cprp-complet-etudiant.pdf' | relative_url }}" class="cahier-complet">
+      <span class="symbole">∫</span>
+      <div>
+        <span class="titre">Approfondissement CPRP complet</span>
+        <span class="description">Pour aller plus loin : exercices d'approfondissement, à utiliser en complément du parcours.</span>
+      </div>
+    </a>
+
+    <p class="cahier-titre">Approfondissement — Par semaine</p>
+    <div class="semaines">
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-cprp-s1-etudiant.pdf' | relative_url }}">
+        <span class="num">1</span>
+        <span class="theme">Calcul, formules et unités</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-cprp-s2-etudiant.pdf' | relative_url }}">
+        <span class="num">2</span>
+        <span class="theme">Proportionnalité et géométrie de base</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-cprp-s3-etudiant.pdf' | relative_url }}">
+        <span class="num">3</span>
+        <span class="theme">Trigonométrie</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-cprp-s4-etudiant.pdf' | relative_url }}">
+        <span class="num">4</span>
+        <span class="theme">Vecteurs</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-cprp-s5-etudiant.pdf' | relative_url }}">
+        <span class="num">5</span>
+        <span class="theme">Fonctions et lecture graphique</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-cprp-s6-etudiant.pdf' | relative_url }}">
         <span class="num">6</span>
         <span class="theme">Dérivation</span>
       </a>
