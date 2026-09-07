@@ -16,5 +16,4 @@ Le **générateur** ci-dessous permet de composer une fiche d'entraînement pers
     <p>Compose ta fiche d'entraînement : choisis les thèmes, la difficulté, le nombre de questions, et télécharge ton PDF avec corrigés.</p>
   </a>
 </div>
-## Fiches d'automatismes (à venir)
-*Des fiches préparées par l'équipe seront également ajoutées au fur et à mesure de l'année.*
+
