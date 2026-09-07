@@ -58,7 +58,7 @@ title: BTS CPI — Passerelle
         <span class="description">Pour aller plus loin : exercices d'approfondissement, à utiliser en complément du parcours.</span>
       </div>
     </a>
-    <p class="cahier-titre">Approfondissement — Cahier par semaine</p>
+    <p class="cahier-titre">Approfondissement — Par semaine</p>
     <div class="semaines">
       <a href="{{ '/passerelle/docs/semaines/approfondissement-cpi-s1-etudiant.pdf' | relative_url }}">
         <span class="num">1</span>
