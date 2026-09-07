@@ -9,7 +9,7 @@ title: BTS Électrotechnique — Passerelle
 
 # BTS Électrotechnique
 
-<div class="specialite-intro">
+<div class="specialite-intro specialite-intro--triple">
 
   <div>
     <h2>Le BTS Électrotechnique au Lycée de Baudre</h2>
@@ -18,8 +18,8 @@ title: BTS Électrotechnique — Passerelle
   </div>
 
   <div>
-    <p class="cahier-titre">Cahier complet</p>
-    <a href="{{ '/passerelle/docs/complets/parcours-electro-complet.pdf' | relative_url }}" class="cahier-complet">
+    <p class="cahier-titre">Parcours — Cahier complet</p>
+    <a href="{{ '/passerelle/docs/complets/parcours-electro-complet-etudiant.pdf' | relative_url }}" class="cahier-complet">
       <span class="symbole">⛛</span>
       <div>
         <span class="titre">Parcours Électro complet</span>
@@ -27,29 +27,68 @@ title: BTS Électrotechnique — Passerelle
       </div>
     </a>
 
-    <p class="cahier-titre">Cahier par semaine</p>
+    <p class="cahier-titre">Parcours — Cahier par semaine</p>
     <div class="semaines">
-      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s1.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s1-etudiant.pdf' | relative_url }}">
         <span class="num">1</span>
         <span class="theme">Calcul, formules et unités</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s2.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s2-etudiant.pdf' | relative_url }}">
         <span class="num">2</span>
         <span class="theme">Proportionnalité et géométrie de base</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s3.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s3-etudiant.pdf' | relative_url }}">
         <span class="num">3</span>
         <span class="theme">Trigonométrie</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s4.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s4-etudiant.pdf' | relative_url }}">
         <span class="num">4</span>
         <span class="theme">Vecteurs</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s5.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s5-etudiant.pdf' | relative_url }}">
         <span class="num">5</span>
         <span class="theme">Fonctions et lecture graphique</span>
       </a>
-      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s6.pdf' | relative_url }}">
+      <a href="{{ '/passerelle/docs/semaines/parcours-electro-s6-etudiant.pdf' | relative_url }}">
+        <span class="num">6</span>
+        <span class="theme">Dérivation</span>
+      </a>
+    </div>
+  </div>
+
+  <div>
+    <p class="cahier-titre">Approfondissement — Cahier complet</p>
+    <a href="{{ '/passerelle/docs/complets/approfondissement-electro-complet-etudiant.pdf' | relative_url }}" class="cahier-complet">
+      <span class="symbole">∫</span>
+      <div>
+        <span class="titre">Approfondissement Électro complet</span>
+        <span class="description">Pour aller plus loin : exercices d'approfondissement, à utiliser en complément du parcours.</span>
+      </div>
+    </a>
+
+    <p class="cahier-titre">Approfondissement — Par semaine</p>
+    <div class="semaines">
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-electro-s1-etudiant.pdf' | relative_url }}">
+        <span class="num">1</span>
+        <span class="theme">Calcul, formules et unités</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-electro-s2-etudiant.pdf' | relative_url }}">
+        <span class="num">2</span>
+        <span class="theme">Proportionnalité et géométrie de base</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-electro-s3-etudiant.pdf' | relative_url }}">
+        <span class="num">3</span>
+        <span class="theme">Trigonométrie</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-electro-s4-etudiant.pdf' | relative_url }}">
+        <span class="num">4</span>
+        <span class="theme">Vecteurs</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-electro-s5-etudiant.pdf' | relative_url }}">
+        <span class="num">5</span>
+        <span class="theme">Fonctions et lecture graphique</span>
+      </a>
+      <a href="{{ '/passerelle/docs/semaines/approfondissement-electro-s6-etudiant.pdf' | relative_url }}">
         <span class="num">6</span>
         <span class="theme">Dérivation</span>
       </a>
